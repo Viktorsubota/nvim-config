@@ -53,8 +53,6 @@ local on_attach = function(client, bufnr)
         vim.lsp.buf.declaration()
     end, opts)
 
-    opts.desc = "Show LSP references"
-    vim.keymap.set("n", "<leader>gr", "<cmd>Telescope lsp_references<CR>", opts)
     vim.keymap.set("n", "gr", function()
         vim.lsp.buf.references()
     end, opts)
