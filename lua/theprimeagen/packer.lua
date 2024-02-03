@@ -84,29 +84,35 @@ return require("packer").startup(function(use)
 				dapui.open()
 			end
 			dap.listeners.before.event_terminated.dapui_config = function()
-				dapui.close()
+				-- dapui.close()
 			end
-			dap.listeners.before.event_exited.dapui_config = function()
-				dapui.close()
-			end
+			dap.listeners.before.event_exited.dapui_config = function() end
+		end,
+	})
+
+	use({
+		"leoluz/nvim-dap-go",
+		ft = { "go" },
+		requires = "mfussenegger/nvim-dap",
+		config = function()
+			require("dap-go").setup()
 		end,
 	})
 
 	-- nvim-dap
 	use({
 		"mfussenegger/nvim-dap",
-		config = function() end,
 	})
 	-- nvim-dap-python
 	use({
 		"mfussenegger/nvim-dap-python",
-		ft = "python",
+		ft = { "python" },
 		requires = {
 			"mfussenegger/nvim-dap",
 			"rcarriga/nvim-dap-ui",
 		},
 		config = function()
-			local path = "~/.local/share/nvim/mmfussenegger/nvim-dap-pythonason/packages/debugpy/venv/bin/python"
+			local path = "/Users/viktorsubota/.local/share/nvim/mason/packages/debugpy/venv/bin/python"
 			require("dap-python").setup(path)
 		end,
 	})
@@ -116,4 +122,15 @@ return require("packer").startup(function(use)
 	use("tpope/vim-commentary")
 
 	use("tpope/vim-surround")
+
+	use({
+		"olexsmir/gopher.nvim",
+		ft = "go",
+		config = function()
+			require("gopher").setup()
+		end,
+		setup = function()
+			vim.cmd([[silent! GoInstallDeps]])
+		end,
+	})
 end)
