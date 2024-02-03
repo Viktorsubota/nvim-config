@@ -12,8 +12,6 @@ lsp.ensure_installed({
 -- Fix Undefined global 'vim'
 lsp.nvim_workspace()
 
-require("lspconfig").pyright.setup({})
-
 local cmp = require("cmp")
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
 local cmp_mappings = lsp.defaults.cmp_mappings({
@@ -49,19 +47,19 @@ local on_attach = function(client, bufnr)
 		vim.lsp.buf.definition()
 	end, opts)
 
-    vim.keymap.set("n", "gD", function()
-        vim.lsp.buf.declaration()
-    end, opts)
+	vim.keymap.set("n", "gD", function()
+		vim.lsp.buf.declaration()
+	end, opts)
 
-    vim.keymap.set("n", "gr", function()
-        vim.lsp.buf.references()
-    end, opts)
-    vim.keymap.set("n", "ga", function()
-        vim.lsp.buf.code_action()
-    end, opts)
-    vim.keymap.set("n", "gi", function()
-        vim.lsp.buf.implementation()
-    end, opts)
+	vim.keymap.set("n", "gr", function()
+		vim.lsp.buf.references()
+	end, opts)
+	vim.keymap.set({ "n", "v" }, "ga", function()
+		vim.lsp.buf.code_action()
+	end, opts)
+	vim.keymap.set("n", "gi", function()
+		vim.lsp.buf.implementation()
+	end, opts)
 	vim.keymap.set("n", "K", function()
 		vim.lsp.buf.hover()
 	end, opts)
@@ -71,7 +69,10 @@ local on_attach = function(client, bufnr)
 	vim.keymap.set("n", "]d", function()
 		vim.diagnostic.goto_prev()
 	end, opts)
-	vim.keymap.set("i", "<C-h>", function()
+	vim.keymap.set("n", "<leader>vd", function()
+		vim.diagnostic.open_float()
+	end, opts)
+	vim.keymap.sgt("i", "<C-h>", function()
 		vim.lsp.buf.signature_help()
 	end, opts)
 	vim.keymap.set("n", "<C-h>", function()
@@ -96,7 +97,7 @@ local on_attach = function(client, bufnr)
 		vim.lsp.diagnostic.show_line_diagnostics()
 	end, opts)
 	vim.keymap.set("n", "<leader>q", function()
-		vim.lsp.diagnostic.set_loclist()
+	    vim.lsp.diagnostic.set_loclist()
 	end, opts)
 	-- Set autocommands conditional on server_capabilities
 	vim.api.nvim_exec(
@@ -113,6 +114,30 @@ local on_attach = function(client, bufnr)
 		false
 	)
 end
+
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+
+local lspconfig = require("lspconfig")
+lspconfig.pyright.setup({})
+
+local util = require("lspconfig/util")
+
+lspconfig.gopls.setup({
+	on_attach = on_attach,
+	capabilities = capabilities,
+	cmd = { "gopls" },
+	filetypes = { "go", "gomod", "gowork", "gotmpl" },
+	root_dir = util.root_pattern("go.work", "go.mod", ".git"),
+	settings = {
+		gopls = {
+			completeUnimported = true,
+			usePlaceholders = true,
+			analyses = {
+				unusedparams = true,
+			},
+		},
+	},
+})
 
 lsp.on_attach(on_attach)
 
@@ -266,9 +291,16 @@ mason_null_ls.setup({
 	ensure_installed = {
 		"prettier", -- prettier formatter
 		"stylua", -- lua formatter
+
 		"black", -- python formatter
 		"pylint", -- python linter
 		"debugpy",
+
+		"gopls",
+		"gofmt",
+		"goimports",
+		"golines",
+		"delve",
 	},
 })
 
@@ -291,6 +323,10 @@ null_ls.setup({
 		formatting.isort,
 		formatting.black,
 		diagnostics.pylint,
+
+		formatting.gofmt,
+		formatting.goimports,
+		formatting.golines,
 	},
 	-- configure format on save
 	on_attach = function(current_client, bufnr)
@@ -313,11 +349,8 @@ null_ls.setup({
 	end,
 })
 
-local capabilities = vim.lsp.protocol.make_client_capabilities()
--- Your capabilities setup logic
-
 -- LSP configuration for yamlls with specific settings
-require("lspconfig").yamlls.setup({
+lspconfig.yamlls.setup({
 	on_attach = on_attach,
 	capabilities = capabilities,
 	settings = {
