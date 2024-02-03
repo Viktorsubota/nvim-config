@@ -27,3 +27,6 @@ vim.keymap.set("n", "<leader>foc", "<cmd>Telescope lsp_outgoing_calls<CR>", opts
 
 opts.desc = "Show incoming calls<CR>"
 vim.keymap.set("n", "<leader>fic", "<cmd>Telescope lsp_incoming_calls<CR>", opts)
+
+opts.desc = "Show document symbols<CR>"
+vim.keymap.set("n", "<leader>pds", "<cmd>Telescope lsp_document_symbols<CR>", opts)
