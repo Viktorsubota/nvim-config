@@ -72,7 +72,7 @@ local on_attach = function(client, bufnr)
 	vim.keymap.set("n", "<leader>vd", function()
 		vim.diagnostic.open_float()
 	end, opts)
-	vim.keymap.sgt("i", "<C-h>", function()
+	vim.keymap.set("i", "<C-h>", function()
 		vim.lsp.buf.signature_help()
 	end, opts)
 	vim.keymap.set("n", "<C-h>", function()
@@ -85,7 +85,7 @@ local on_attach = function(client, bufnr)
 		vim.lsp.buf.remove_workspace_folder()
 	end, opts)
 	vim.keymap.set("n", "<leader>wl", function()
-		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+		vim.inspect(vim.lsp.buf.list_workspace_folders())
 	end, opts)
 	vim.keymap.set("n", "<leader>D", function()
 		vim.lsp.buf.type_definition()
@@ -93,12 +93,17 @@ local on_attach = function(client, bufnr)
 	vim.keymap.set("n", "<leader>rn", function()
 		vim.lsp.buf.rename()
 	end, opts)
-	vim.keymap.set("n", "<leader>e", function()
+	vim.keymap.set("n", "<leader>gs", function()
 		vim.lsp.diagnostic.show_line_diagnostics()
 	end, opts)
 	vim.keymap.set("n", "<leader>q", function()
-	    vim.lsp.diagnostic.set_loclist()
+		vim.lsp.diagnostic.set_loclist()
 	end, opts)
+
+	vim.keymap.set("n", "<leader>hw", function()
+		print("Hello World!")
+	end, opts)
+
 	-- Set autocommands conditional on server_capabilities
 	vim.api.nvim_exec(
 		[[
@@ -123,7 +128,9 @@ lspconfig.pyright.setup({})
 local util = require("lspconfig/util")
 
 lspconfig.gopls.setup({
-	on_attach = on_attach,
+	on_attach = function(client, bufnr)
+		on_attach(client, bufnr)
+	end,
 	capabilities = capabilities,
 	cmd = { "gopls" },
 	filetypes = { "go", "gomod", "gowork", "gotmpl" },
