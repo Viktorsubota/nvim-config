@@ -1,6 +1,42 @@
-local lsp = require("lsp-zero")
+-- Function to check if a file exists
+local function file_exists(file_path)
+	local file = io.open(file_path, "r")
+	if file then
+		io.close(file)
+		return true
+	else
+		return false
+	end
+end
 
-lsp.preset("recommended")
+-- Function to find .pylintrc in Git root
+local function find_pylintrc_in_git_root()
+	local git_root_cmd = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+
+	if git_root_cmd ~= "" then
+		local git_root = vim.fn.trim(git_root_cmd)
+		local pylintrc_path = git_root .. "/.pylintrc"
+
+		return file_exists(pylintrc_path) and pylintrc_path or nil
+	else
+		return nil
+	end
+end
+
+local lsp = require("lsp-zero")
+lsp.preset("recommended-wrong")
+
+-- Get the current configuration
+local config = lsp.config()
+
+-- If the config includes pylsp for Python, remove it
+if config["python"] and config["python"]["cmd"] == "pylsp" then
+    config["python"] = nil
+end
+
+-- Apply the updated configuration
+lsp.config(config)
+
 
 lsp.ensure_installed({
 	"lua_ls",
@@ -104,9 +140,11 @@ local on_attach = function(client, bufnr)
 		print("Hello World!")
 	end, opts)
 
-	-- Set autocommands conditional on server_capabilities
-	vim.api.nvim_exec(
-		[[
+	-- Check if the language server supports document highlights
+	if client ~= nil and client.supports_method("textDocument/documentHighlight") then
+		-- Set autocommands conditional on server_capabilities
+		vim.api.nvim_exec(
+			[[
     hi LspReferenceRead cterm=bold ctermbg=135 guibg=#463e59
     hi LspReferenceText cterm=bold ctermbg=135 guibg=#463e59
     hi LspReferenceWrite cterm=bold ctermbg=135 guibg=#463e59
@@ -116,14 +154,14 @@ local on_attach = function(client, bufnr)
     autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
     augroup END
     ]],
-		false
-	)
+			false
+		)
+	end
 end
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 
 local lspconfig = require("lspconfig")
-lspconfig.pyright.setup({})
 
 local util = require("lspconfig/util")
 
@@ -163,11 +201,6 @@ if not snip_status_ok then
 end
 
 require("luasnip/loaders/from_vscode").lazy_load()
-
-local check_backspace = function()
-	local col = vim.fn.col(".") - 1
-	return col == 0 or vim.fn.getline("."):sub(col, col):match("%s")
-end
 
 --   פּ ﯟ   some other good icons
 local kind_icons = {
@@ -216,37 +249,6 @@ cmp.setup({
 			i = cmp.mapping.abort(),
 			c = cmp.mapping.close(),
 		}),
-		-- Accept currently selected item. If none selected, `select` first item.
-		-- Set `select` to `false` to only confirm explicitly selected items.
-		-- ["<CR>"] = cmp.mapping.confirm { select = true },
-		-- ["<Tab>"] = cmp.mapping(function(fallback)
-		--   if cmp.visible() then
-		--     cmp.select_next_item()
-		--   elseif luasnip.expandable() then
-		--     luasnip.expand()
-		--   elseif luasnip.expand_or_jumpable() then
-		--     luasnip.expand_or_jump()
-		--   elseif check_backspace() then
-		--     fallback()
-		--   else
-		--     fallback()
-		--   end
-		-- end, {
-		--   "i",
-		--   "s",
-		-- }),
-		-- ["<S-Tab>"] = cmp.mapping(function(fallback)
-		--   if cmp.visible() then
-		--     cmp.select_prev_item()
-		--   elseif luasnip.jumpable(-1) then
-		--     luasnip.jump(-1)
-		--   else
-		--     fallback()
-		--   end
-		-- end, {
-		--   "i",
-		--   "s",
-		-- }),
 	},
 	formatting = {
 		fields = { "kind", "abbr", "menu" },
@@ -264,9 +266,9 @@ cmp.setup({
 		end,
 	},
 	sources = {
-		{ name = "path" },
 		{ name = "nvim_lsp", max_item_count = 20 },
 		{ name = "nvim_lua" },
+		{ name = "path" },
 		{ name = "buffer", Keyword_length = 3, max_item_count = 10 },
 		{ name = "luasnip" },
 	},
@@ -302,6 +304,7 @@ mason_null_ls.setup({
 		"black", -- python formatter
 		"pylint", -- python linter
 		"debugpy",
+		"ruff_lsp",
 
 		"gopls",
 		"gofmt",
@@ -315,26 +318,36 @@ mason_null_ls.setup({
 local formatting = null_ls.builtins.formatting -- to setup formatters
 local diagnostics = null_ls.builtins.diagnostics -- to setup linters
 
+-- diagnostics.pylint.setup({})
+
 -- to setup format on save
 local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
--- configure null_ls
 null_ls.setup({
+
+	debug = true,
+	autostart = true,
+
 	-- add package.json as identifier for root (for typescript monorepos)
 	root_dir = null_ls_utils.root_pattern("pyproject.toml", ".null-ls-root", "Makefile", ".git", "go.mod"),
 	-- setup formatters & linters
 	sources = {
 		--  to disable file types use
 		--  "formatting.prettier.with({disabled_filetypes: {}})" (see null-ls docs)
+
 		formatting.stylua, -- lua formatter
+
 		formatting.isort,
 		formatting.black,
-		diagnostics.pylint,
+		diagnostics.pylint.with({
+			extra_args = { "--rcfile", find_pylintrc_in_git_root() or "" },
+		}),
 
 		formatting.gofmt,
 		formatting.goimports,
 		formatting.golines,
 	},
+
 	-- configure format on save
 	on_attach = function(current_client, bufnr)
 		if current_client.supports_method("textDocument/formatting") then
@@ -356,6 +369,28 @@ null_ls.setup({
 	end,
 })
 
+lspconfig.pyright.setup({
+	capabilities = (function()
+		capabilities.textDocument.publishDiagnostics.tagSupport.valueSet = { 2 }
+		return capabilities
+	end)(),
+
+	python = {
+		analysis = {
+			useLibraryCodeForTypes = true,
+			diagnosticSeverityOverrides = {
+				reportUnusedVariable = "warning", -- or anything
+			},
+			typeCheckingMode = "basic",
+		},
+	},
+})
+lspconfig.ruff_lsp.setup({
+	on_attach = function(client, _)
+		client.server_capabilities.hoverProvider = true
+	end,
+})
+
 -- LSP configuration for yamlls with specific settings
 lspconfig.yamlls.setup({
 	on_attach = on_attach,
@@ -366,3 +401,5 @@ lspconfig.yamlls.setup({
 		},
 	},
 })
+
+lspconfig.jsonls.setup({})
