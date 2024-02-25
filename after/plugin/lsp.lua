@@ -24,19 +24,7 @@ local function find_pylintrc_in_git_root()
 end
 
 local lsp = require("lsp-zero")
-lsp.preset("recommended-wrong")
-
--- Get the current configuration
-local config = lsp.config()
-
--- If the config includes pylsp for Python, remove it
-if config["python"] and config["python"]["cmd"] == "pylsp" then
-    config["python"] = nil
-end
-
--- Apply the updated configuration
-lsp.config(config)
-
+lsp.preset("recommended")
 
 lsp.ensure_installed({
 	"lua_ls",
