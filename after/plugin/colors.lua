@@ -9,7 +9,17 @@ function ColorMyPencils(color)
 	vim.wo.cursorline = true
 
 	-- Customize the highlighting color to grey
-	vim.cmd("highlight CursorLine ctermbg=135 guibg=#362E4A")
+	vim.cmd("highlight CursorLine ctermbg=223 guibg=#2c3042")
+	vim.cmd("highlight ColorColumn ctermbg=223 guibg=#2c3042")
 end
+
+require("catppuccin").setup({
+	-- transparent_background = true,
+	-- dim_inactive = {
+	-- 	enabled = true, -- dims the background color of inactive window
+	-- 	shade = "dark",
+	-- 	percentage = 0.15, -- percentage of the shade to apply to the inactive window
+	-- },
+})
 
 ColorMyPencils()
