@@ -1,10 +1,8 @@
-local o = vim.opt
-
--- Line numbers etc in Netrw
-vim.cmd([[let g:netrw_bufsettings = 'noma nomod nu nobl nowrap ro']])
-
--- Always split to the right
-vim.o.splitright = true
-
--- Always split to the bottom
-vim.o.splitbelow = true
+-- Higlight yanked text
+vim.api.nvim_create_autocmd("TextYankPost", {
+    desc = "Higlight when yanking text",
+    group = vim.api.nvim_create_augroup("highlight-yank", {clear = true}),
+    callback = function()
+        vim.highlight.on_yank()
+    end,
+})
