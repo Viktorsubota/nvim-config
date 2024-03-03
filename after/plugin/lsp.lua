@@ -69,6 +69,7 @@ local on_attach = function(client, bufnr)
 
 	vim.keymap.set("n", "gd", function()
 		vim.lsp.buf.definition()
+		vim.cmd("normal! zz")
 	end, opts)
 
 	vim.keymap.set("n", "gD", function()
@@ -326,7 +327,9 @@ null_ls.setup({
 		formatting.stylua, -- lua formatter
 
 		formatting.isort,
-		formatting.black,
+		formatting.black.with({
+			extra_args = { "--line-length", "100" },
+		}),
 		diagnostics.pylint.with({
 			extra_args = { "--rcfile", find_pylintrc_in_git_root() or "" },
 		}),
