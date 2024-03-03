@@ -1,24 +1,49 @@
-require'nvim-treesitter.configs'.setup {
-  -- A list of parser names, or "all" (the five listed parsers should always be installed)
-  ensure_installed = { "help", "lua", "vim", "vimdoc", "go", "gomod", "gosum", "python", "yaml", "json", "markdown_inline", "markdown" },
+require("nvim-treesitter.configs").setup({
+	-- A list of parser names, or "all" (the five listed parsers should always be installed)
+	ensure_installed = {
+		"help",
+		"lua",
+		"vim",
+		"vimdoc",
+		"go",
+		"gomod",
+		"gosum",
+		"python",
+		"yaml",
+		"json",
+		"markdown_inline",
+		"markdown",
+	},
 
-  -- Install parsers synchronously (only applied to `ensure_installed`)
-  sync_install = false,
+	-- enable indentation
+	indent = { enable = true },
 
-  -- Automatically install missing parsers when entering buffer
-  -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
-  auto_install = true,
+	-- Install parsers synchronously (only applied to `ensure_installed`)
+	sync_install = false,
 
-  ignore_install = { "help" },
+	-- Automatically install missing parsers when entering buffer
+	-- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
+	auto_install = true,
 
-  highlight = {
-    enable = true,
+	ignore_install = { "help" },
 
-   -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-    -- Using this option may slow down your editor, and you may see some duplicate highlights.
-    -- Instead of true it can also be a list of languages
-    additional_vim_regex_highlighting = false,
-  },
-}
+	highlight = {
+		enable = true,
 
+		-- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+		-- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+		-- Using this option may slow down your editor, and you may see some duplicate highlights.
+		-- Instead of true it can also be a list of languages
+		additional_vim_regex_highlighting = false,
+	},
+
+	incremental_selection = {
+		enable = true,
+		keymaps = {
+			init_selection = "<C-space>",
+			node_incremental = "<C-space>",
+			scope_incremental = false,
+			node_decremental = "<bs>",
+		},
+	},
+})

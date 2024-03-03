@@ -41,7 +41,7 @@ return require("packer").startup(function(use)
 
 	use({
 		"VonHeikemen/lsp-zero.nvim",
-		branch = "v1.x",
+		branch = "v2.x",
 		requires = {
 			-- LSP Support
 			{ "neovim/nvim-lspconfig" },
@@ -133,4 +133,20 @@ return require("packer").startup(function(use)
 			vim.cmd([[silent! GoInstallDeps]])
 		end,
 	})
+
+	use({
+		"kdheepak/lazygit.nvim",
+		-- optional for floating window border decoration
+		requires = {
+			"nvim-lua/plenary.nvim",
+		},
+	})
+
+	use({ "hedyhli/outline.nvim" })
+
+	use("sindrets/diffview.nvim")
+
+	use({ "stevearc/dressing.nvim" })
+
+	use("lukas-reineke/indent-blankline.nvim")
 end)
