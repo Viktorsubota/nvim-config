@@ -1,3 +1,5 @@
+local o = vim.opt
+
 vim.opt.guicursor = ""
 
 vim.opt.nu = true
@@ -31,3 +33,16 @@ vim.opt.updatetime = 50
 vim.opt.colorcolumn = "80,100"
 
 vim.g.mapleader = " "
+
+vim.opt.mouse = ""
+
+-- Line numbers etc in Netrw
+vim.cmd([[let g:netrw_bufsettings = 'noma nomod nu nobl nowrap ro']])
+
+-- Always split to the right
+vim.o.splitright = true
+
+-- Always split to the bottom
+vim.o.splitbelow = true
+
+
