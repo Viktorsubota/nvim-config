@@ -1,4 +1,5 @@
-require("vsubota.remap")
-require("vsubota.mouse")
+require("vsubota.opt")
 require("vsubota.config")
+require("vsubota.remap")
 
+require("vsubota.lazy")
