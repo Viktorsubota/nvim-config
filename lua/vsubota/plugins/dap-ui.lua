@@ -1,6 +1,6 @@
 return {
 	"rcarriga/nvim-dap-ui",
-	dependencies = "mfussenegger/nvim-dap",
+	dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
 	library = { plugins = { "nvim-dap-ui" }, types = true },
 	event = "VeryLazy",
 	config = function()
