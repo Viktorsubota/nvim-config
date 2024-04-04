@@ -40,7 +40,7 @@ return {
 							return table.concat(parts, " ➜ ")
 						end,
 						color = function(_)
-							return { fg = "#92b3f4" }
+							return { fg = "#8AADF4" }
 						end,
 					},
 				},

@@ -13,9 +13,9 @@ function ApplyCustomColoros(color)
 	vim.cmd("highlight ColorColumn ctermbg=223 guibg=#2c3042")
 
 	-- Number Line color
-	vim.cmd("highlight LineNr guifg=#8180ab")
+	vim.cmd("highlight LineNr guifg=#6E6C7E")
 	-- Cursor Line color
-	vim.cmd("highlight CursorLineNr guifg=#d1d4ed")
+	vim.cmd("highlight CursorLineNr guifg=#C9CBFF")
 end
 
 return {
