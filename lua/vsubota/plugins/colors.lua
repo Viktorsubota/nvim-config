@@ -11,6 +11,11 @@ function ColorMyPencils(color)
 	-- Customize the highlighting color to grey
 	vim.cmd("highlight CursorLine ctermbg=223 guibg=#2c3042")
 	vim.cmd("highlight ColorColumn ctermbg=223 guibg=#2c3042")
+
+	-- Number Line color
+	vim.cmd("highlight LineNr guifg=#8180ab")
+	-- Cursor Line color
+	vim.cmd("highlight CursorLineNr guifg=#c3c7e3")
 end
 
 return {
