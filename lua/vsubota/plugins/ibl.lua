@@ -1,11 +1,13 @@
 return {
 	"lukas-reineke/indent-blankline.nvim",
 	config = function()
+		vim.api.nvim_set_hl(0, "CurrentScope", { fg = "#3b4061" })
 		require("ibl").setup({
 			scope = {
-				enabled = false,
-				show_start = true,
-				show_end = true,
+				highlight = "CurrentScope",
+				enabled = true,
+				show_start = false,
+				show_end = false,
 			},
 		})
 	end,
