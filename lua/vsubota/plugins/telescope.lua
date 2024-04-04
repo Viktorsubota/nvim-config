@@ -2,8 +2,19 @@ return {
 	{
 		"nvim-telescope/telescope.nvim",
 		tag = "0.1.5",
-		dependencies = { "nvim-lua/plenary.nvim" },
+		dependencies = { "nvim-lua/plenary.nvim", { "nvim-telescope/telescope-fzf-native.nvim", build = "make" } },
 		config = function()
+			local telescope = require("telescope")
+			local actions = require("telescope.actions")
+			local transform_mod = require("telescope.actions.mt").transform_mod
+
+			-- or create your custom action
+			local custom_actions = transform_mod({
+				open_trouble_qflist = function(prompt_bufnr)
+					vim.cmd("copen")
+				end,
+			})
+
 			require("telescope").setup({
 				defaults = {
 					layout_config = {
@@ -16,10 +27,15 @@ return {
 					mappings = {
 						i = {
 							["<C-h>"] = "which_key",
+							["<C-k>"] = actions.move_selection_previous, -- move to prev result
+							["<C-j>"] = actions.move_selection_next, -- move to next result
+							["<C-q>"] = actions.send_selected_to_qflist + custom_actions.open_trouble_qflist,
 						},
 					},
 				},
 			})
+
+			telescope.load_extension("fzf")
 
 			local builtin = require("telescope.builtin")
 			vim.keymap.set("n", "<leader>pf", builtin.find_files, {})
