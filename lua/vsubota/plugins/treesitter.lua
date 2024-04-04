@@ -1,11 +1,10 @@
 local M = {
 	"nvim-treesitter/nvim-treesitter",
-	event = "VeryLazy",
+	event = { "BufReadPre", "BufNewFile" },
 	build = function()
 		require("nvim-treesitter.install").update({ with_sync = true })()
 	end,
 	config = function()
----@diagnostic disable-next-line: missing-fields
 		require("nvim-treesitter.configs").setup({
 			-- A list of parser names, or "all" (the five listed parsers should always be installed)
 			ensure_installed = {
@@ -21,6 +20,7 @@ local M = {
 				"json",
 				"markdown_inline",
 				"markdown",
+				"terraform",
 			},
 
 			-- enable indentation

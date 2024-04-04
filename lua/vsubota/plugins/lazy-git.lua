@@ -1,11 +1,17 @@
 return {
-    "kdheepak/lazygit.nvim",
-    event = "VeryLazy",
-    -- optional for floating window border decoration
-    dependencies = {
-        "nvim-lua/plenary.nvim",
-    },
-    config = function()
-        vim.keymap.set("n", "<leader>lg", "<cmd>LazyGit<CR>")
-    end
+	"kdheepak/lazygit.nvim",
+	-- optional for floating window border decoration
+	dependencies = {
+		"nvim-lua/plenary.nvim",
+	},
+	cmd = {
+		"LazyGit",
+		"LazyGitConfig",
+		"LazyGitCurrentFile",
+		"LazyGitFilter",
+		"LazyGitFilterCurrentFile",
+	},
+	keys = {
+		{ "<leader>lg", "<cmd>LazyGit<cr>", desc = "Open lazy git" },
+	},
 }
