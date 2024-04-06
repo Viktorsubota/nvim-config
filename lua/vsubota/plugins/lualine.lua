@@ -32,11 +32,12 @@ return {
 						fmt = function(input)
 							local line = string.gsub(input, "oil://", ""):gsub("/$", ""):gsub("/ ", " ")
 
-							local project = vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
+							-- local project = vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
 							local path = vim.fn.fnamemodify(line, ":.:h")
 							local filename = vim.fn.fnamemodify(line, ":t")
 
-							local parts = { project, path, filename }
+							-- local parts = { project, path, filename }
+							local parts = { path, filename }
 							return table.concat(parts, " ➜ ")
 						end,
 						color = function(_)
