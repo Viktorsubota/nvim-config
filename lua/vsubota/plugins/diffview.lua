@@ -1,1 +1,13 @@
-return { "sindrets/diffview.nvim", event = "VeryLazy" }
+return {
+	"sindrets/diffview.nvim",
+	cmd = {
+		"DiffviewClose",
+		"DiffviewFileHistory",
+		"DiffviewFocusFiles",
+		"DiffviewLog",
+		"DiffviewOpen",
+		"DiffviewRefresh",
+		"DiffviewToggleFiles",
+		"DisableAutoSave",
+	},
+}
