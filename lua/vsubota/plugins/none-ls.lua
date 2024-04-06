@@ -42,7 +42,7 @@ return {
 					"black", -- python formatter
 					"pylint", -- python linter
 					"debugpy",
-                    "isort",
+					"isort",
 					"ruff_lsp",
 
 					"gopls",
@@ -63,13 +63,12 @@ return {
 		config = function()
 			local null_ls = require("null-ls")
 
-            local null_ls_utils = require("null-ls.utils")
-            local utils = require("vsubota.utils")
-            
+			local null_ls_utils = require("null-ls.utils")
+
 			local formatting = null_ls.builtins.formatting -- to setup formatters
 			local diagnostics = null_ls.builtins.diagnostics -- to setup linters
 
-            local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+			local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
 			null_ls.setup({
 

@@ -1,9 +1,11 @@
 return {
 	{
 		"hrsh7th/cmp-nvim-lsp",
+		event = { "InsertEnter" },
 	},
 	{
 		"L3MON4D3/LuaSnip",
+		event = { "InsertEnter" },
 		dependencies = {
 			"saadparwaiz1/cmp_luasnip",
 			"rafamadriz/friendly-snippets",
@@ -16,9 +18,14 @@ return {
 	},
 	{
 		"hrsh7th/nvim-cmp",
+		event = { "InsertEnter" },
 		config = function()
-			local cmp = require("cmp")
 			require("luasnip.loaders.from_vscode").lazy_load()
+
+			-- If you want insert `(` after select function or method item
+			local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+			local cmp = require("cmp")
+			cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
 
 			cmp.setup({
 				snippet = {
@@ -36,12 +43,15 @@ return {
 					["<C-Space>"] = cmp.mapping.complete(),
 					["<C-e>"] = cmp.mapping.abort(),
 					["<CR>"] = cmp.mapping.confirm({ select = true }),
+					["<C-k>"] = cmp.mapping.select_prev_item(), -- previous suggestion
+					["<C-j>"] = cmp.mapping.select_next_item(), -- next suggestion
 				}),
 				sources = cmp.config.sources({
-					{ name = "nvim_lsp" },
-					{ name = "luasnip" }, -- For luasnip users.
+					{ name = "nvim_lsp", max_item_count = 15 },
+					{ name = "luasnip", max_item_count = 10 }, -- For luasnip users.
 				}, {
 					{ name = "buffer" },
+					{ name = "path" },
 				}),
 			})
 		end,

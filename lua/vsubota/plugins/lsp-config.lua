@@ -1,6 +1,7 @@
 return {
 	{
 		"williamboman/mason.nvim",
+		event = { "BufReadPre", "BufNewFile" },
 		config = function()
 			require("mason").setup({
 				ui = {
@@ -19,18 +20,9 @@ return {
 			-- LSP Support
 			"neovim/nvim-lspconfig",
 			"williamboman/mason.nvim",
-
-			-- Autocompletion
-			"hrsh7th/nvim-cmp",
-			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-path",
-			"saadparwaiz1/cmp_luasnip",
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-nvim-lua",
-
-			-- Snippets
-			"L3MON4D3/LuaSnip",
-			"rafamadriz/friendly-snippets",
+		},
+		opts = {
+			auto_install = true,
 		},
 		config = function()
 			require("mason-lspconfig").setup({
@@ -82,9 +74,9 @@ return {
 						-- Set autocommands conditional on server_capabilities
 						vim.api.nvim_exec(
 							[[
-    hi LspReferenceRead cterm=bold ctermbg=135 guibg=#463e59
-    hi LspReferenceText cterm=bold ctermbg=135 guibg=#463e59
-    hi LspReferenceWrite cterm=bold ctermbg=135 guibg=#463e59
+    hi LspReferenceRead cterm=bold ctermbg=135 guibg=#363A4F
+    hi LspReferenceText cterm=bold ctermbg=135 guibg=#363A4F
+    hi LspReferenceWrite cterm=bold ctermbg=135 guibg=#363A4F
     augroup lsp_document_highlight
     autocmd! * <buffer>
     autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
