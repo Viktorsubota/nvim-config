@@ -39,6 +39,9 @@ return {
 		"neovim/nvim-lspconfig",
 		config = function()
 			local lspconfig = require("lspconfig")
+			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+			-- Setup key maps ------------------------------------
 
 			-- Use LspAttach autocommand to only map the following keys
 			-- after the language server attaches to the current buffer
@@ -94,16 +97,19 @@ return {
 			vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
 			vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist)
 
-			lspconfig.lua_ls.setup({})
+			-- Setup LSPs ------------------------------------
 
-			lspconfig.pyright.setup({})
+			local util = require("lspconfig/util")
+
+			lspconfig.lua_ls.setup({ capabilities = capabilities })
+			lspconfig.pyright.setup({ capabilities = capabilities })
 			lspconfig.ruff_lsp.setup({
+				capabilities = capabilities,
 				on_attach = function(client, _)
 					client.server_capabilities.hoverProvider = true
 				end,
 			})
 
-			local util = require("lspconfig/util")
 			lspconfig.gopls.setup({
 				cmd = { "gopls" },
 				filetypes = { "go", "gomod", "gowork", "gotmpl" },
@@ -119,8 +125,8 @@ return {
 				},
 			})
 
-			lspconfig.yamlls.setup({})
-			lspconfig.jsonls.setup({})
+			lspconfig.yamlls.setup({ capabilities = capabilities })
+			lspconfig.jsonls.setup({ capabilities = capabilities })
 		end,
 	},
 }
