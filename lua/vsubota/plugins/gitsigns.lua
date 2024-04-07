@@ -6,6 +6,10 @@ return {
 		vim.keymap.set("v", "<leader>gu", "<cmd>:'<,'>Gitsigns reset_hunk<CR>", { desc = "Reset git hunk selection" })
 		vim.keymap.set("n", "<leader>gp", "<cmd>:Gitsigns preview_hunk<CR>", { desc = "Preview git hunk" })
 
+		vim.api.nvim_set_hl(0, "GitSignsAdd", { fg = "#8aadf4" })
+		vim.api.nvim_set_hl(0, "GitSignsChange", { fg = "#eed49f" })
+		vim.api.nvim_set_hl(0, "GitSignsDelete", { fg = "#ed8796" })
+
 		require("gitsigns").setup({
 			signs = {
 				add = { text = "│" },
