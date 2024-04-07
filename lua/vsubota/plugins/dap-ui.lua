@@ -14,7 +14,6 @@ return {
 		"DapToggleRepl",
 	},
 	dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
-	library = { plugins = { "nvim-dap-ui" }, types = true },
 	config = function()
 		local dap, dapui = require("dap"), require("dapui")
 		dapui.setup()
