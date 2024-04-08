@@ -3,7 +3,6 @@ return {
 	config = function()
 		require("ibl").setup({
 			scope = {
-				highlight = "CurrentScope",
 				enabled = true,
 				show_start = false,
 				show_end = false,
