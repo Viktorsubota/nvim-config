@@ -40,9 +40,9 @@ return {
 							local parts = { path, filename }
 							return table.concat(parts, " ➜ ")
 						end,
-						color = function(_)
-							return { fg = "#8AADF4" }
-						end,
+						-- color = function(_)
+						-- 	return { fg = "#8AADF4" }
+						-- end,
 					},
 				},
 				lualine_x = { "filetype" },

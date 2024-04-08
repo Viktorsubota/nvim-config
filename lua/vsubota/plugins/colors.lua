@@ -1,30 +1,43 @@
-function ApplyCustomColoros(color)
-	color = color or "catppuccin"
-	vim.cmd.colorscheme(color)
+local custom_highlights = {
+	["catppuccin-mocha"] = function(colors)
+		return {
+			Normal = { bg = "none" },
+			NormalFloat = { bg = "none" },
 
-	vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-	vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+			-- Number Line color
+			LineNr = { fg = colors.overlay0 },
+			-- Cursor Line color
+			CursorLineNr = { fg = colors.saphire },
 
-	-- Enable line highlighting for the current line by default
-	vim.wo.cursorline = true
+			-- Customize the highlighting color to grey for current and lenth lines
+			CursorLine = { bg = colors.surface0 },
+			ColorColumn = { bg = colors.surface0 },
 
-	-- Customize the highlighting color to grey
-	vim.cmd("highlight CursorLine ctermbg=223 guibg=#2c3042")
-	vim.cmd("highlight ColorColumn ctermbg=223 guibg=#2c3042")
+			-- Function IBL line
+			CurrentScope = { fg = colors.surface1 },
 
-	-- Number Line color
-	vim.cmd("highlight LineNr guifg=#6E6C7E")
-	-- Cursor Line color
-	vim.cmd("highlight CursorLineNr guifg=#C9CBFF")
-end
+			-- Gitsign colors for added, changed and deleted lines
+			GitSignsAdd = { fg = colors.blue },
+			GitSignsChange = { fg = colors.yellow },
+			GitSignsDelete = { fg = colors.red },
+
+			-- Collors for refs autohiglights
+			LspReferenceRead = { cterm = { bold = true }, ctermbg = 135, bg = colors.surface1 },
+			LspReferenceText = { cterm = { bold = true }, ctermbg = 135, bg = colors.surface1 },
+			LspReferenceWrite = { cterm = { bold = true }, ctermbg = 135, bg = colors.surface1 },
+		}
+	end,
+}
 
 return {
 	"catppuccin/nvim",
 	name = "catppuccin",
 	priority = 1000,
 	config = function()
-		require("catppuccin").setup({})
+		local current_colorscheme = "catppuccin-mocha"
 
-		ApplyCustomColoros()
+		require("catppuccin").setup({ custom_highlights = custom_highlights["catppuccin-mocha"] })
+
+		vim.cmd.colorscheme(current_colorscheme)
 	end,
 }
