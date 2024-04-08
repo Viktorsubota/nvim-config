@@ -77,9 +77,6 @@ return {
 						-- Set autocommands conditional on server_capabilities
 						vim.api.nvim_exec(
 							[[
-    hi LspReferenceRead cterm=bold ctermbg=135 guibg=#494d64
-    hi LspReferenceText cterm=bold ctermbg=135 guibg=#494d64
-    hi LspReferenceWrite cterm=bold ctermbg=135 guibg=#494d64
     augroup lsp_document_highlight
     autocmd! * <buffer>
     autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()

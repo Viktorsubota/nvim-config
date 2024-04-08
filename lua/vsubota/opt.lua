@@ -1,5 +1,3 @@
-local o = vim.opt
-
 vim.opt.guicursor = ""
 
 vim.opt.nu = true
@@ -46,3 +44,6 @@ vim.o.splitright = true
 
 -- Always split to the bottom
 vim.o.splitbelow = true
+
+-- Enable line highlighting for the current line by default
+vim.wo.cursorline = true
