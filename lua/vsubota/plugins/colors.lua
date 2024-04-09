@@ -7,8 +7,10 @@ local custom_highlights = {
 			CursorLineNr = { fg = colors.saphire },
 
 			-- Customize the highlighting color to grey for current and lenth lines
-			CursorLine = { bg = colors.surface0 },
-			ColorColumn = { bg = colors.surface0 },
+			-- CursorLine = { bg = colors.surface0 },
+			-- ColorColumn = { bg = colors.surface0 },
+			CursorLine = { bg = "#303347" },
+			ColorColumn = { bg = "#303347" },
 
 			-- Function IBL line
 			IblScope = { fg = colors.surface2 },
