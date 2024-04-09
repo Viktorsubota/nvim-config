@@ -1,7 +1,7 @@
 return {
 	{
 		"williamboman/mason.nvim",
-		event = { "BufReadPre", "BufNewFile" },
+		lazy = true,
 		config = function()
 			require("mason").setup({
 				ui = {
@@ -15,28 +15,8 @@ return {
 		end,
 	},
 	{
-		"williamboman/mason-lspconfig.nvim",
-		dependencies = {
-			-- LSP Support
-			"neovim/nvim-lspconfig",
-			"williamboman/mason.nvim",
-		},
-		opts = {
-			auto_install = true,
-		},
-		config = function()
-			require("mason-lspconfig").setup({
-				ensure_installed = {
-					"lua_ls",
-					"dockerls",
-					"pyright",
-					"gopls",
-				},
-			})
-		end,
-	},
-	{
 		"neovim/nvim-lspconfig",
+		lazy = true,
 		config = function()
 			local lspconfig = require("lspconfig")
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
@@ -59,8 +39,6 @@ return {
 					vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
 					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
 					vim.keymap.set({ "n", "i" }, "<C-h>", vim.lsp.buf.signature_help, opts)
-					vim.keymap.set("n", "<space>wa", vim.lsp.buf.add_workspace_folder, opts)
-					vim.keymap.set("n", "<space>wr", vim.lsp.buf.remove_workspace_folder, opts)
 					vim.keymap.set("n", "<space>wl", function()
 						print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
 					end, opts)
@@ -98,8 +76,6 @@ return {
 
 			local util = require("lspconfig/util")
 
-			lspconfig.lua_ls.setup({ capabilities = capabilities })
-			lspconfig.pyright.setup({ capabilities = capabilities })
 			lspconfig.ruff_lsp.setup({
 				capabilities = capabilities,
 				on_attach = function(client, _)
@@ -122,8 +98,34 @@ return {
 				},
 			})
 
+			lspconfig.lua_ls.setup({ capabilities = capabilities })
+			lspconfig.pyright.setup({ capabilities = capabilities })
+
+			lspconfig.terraformls.setup({ capabilities = capabilities })
 			lspconfig.yamlls.setup({ capabilities = capabilities })
 			lspconfig.jsonls.setup({ capabilities = capabilities })
+		end,
+	},
+	{
+		"williamboman/mason-lspconfig.nvim",
+		event = { "BufReadPre", "BufNewFile" },
+		dependencies = {
+			-- LSP Support
+			"neovim/nvim-lspconfig",
+			"williamboman/mason.nvim",
+		},
+		opts = {
+			auto_install = true,
+		},
+		config = function()
+			require("mason-lspconfig").setup({
+				ensure_installed = {
+					"lua_ls",
+					"dockerls",
+					"pyright",
+					"gopls",
+				},
+			})
 		end,
 	},
 }
