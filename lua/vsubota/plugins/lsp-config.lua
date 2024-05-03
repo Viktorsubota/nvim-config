@@ -38,7 +38,7 @@ return {
 					vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
 					vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
 					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-					vim.keymap.set({ "n", "i" }, "<C-h>", vim.lsp.buf.signature_help, opts)
+					vim.keymap.set({ "n", "i" }, "<C-s>", vim.lsp.buf.signature_help, opts)
 					vim.keymap.set("n", "<space>wl", function()
 						print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
 					end, opts)
@@ -89,6 +89,8 @@ return {
 				root_dir = util.root_pattern("go.work", "go.mod", ".git"),
 				settings = {
 					gopls = {
+						completeUnimported = true,
+						usePlaceholders = true,
 						analyses = {
 							unusedparams = true,
 						},
@@ -102,8 +104,17 @@ return {
 				capabilities = capabilities,
 				settings = {
 					Lua = {
+						runtime = {
+							-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+							version = "LuaJIT",
+						},
 						diagnostics = {
+							-- Get the language server to recognize the `vim` global
 							globals = { "vim" },
+						},
+						-- Do not send telemetry data containing a randomized but unique identifier
+						telemetry = {
+							enable = false,
 						},
 					},
 				},

@@ -44,8 +44,6 @@ return {
 					["<C-Space>"] = cmp.mapping.complete(),
 					["<C-e>"] = cmp.mapping.abort(),
 					["<CR>"] = cmp.mapping.confirm({ select = true }),
-					["<C-k>"] = cmp.mapping.select_prev_item(), -- previous suggestion
-					["<C-j>"] = cmp.mapping.select_next_item(), -- next suggestion
 				}),
 				sources = cmp.config.sources({
 					{ name = "nvim_lsp", max_item_count = 15 },
