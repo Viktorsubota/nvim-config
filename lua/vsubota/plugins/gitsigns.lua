@@ -1,6 +1,10 @@
 return {
 	"lewis6991/gitsigns.nvim",
-	event = "VeryLazy",
+	event = { "BufReadPre", "BufNewFile" },
+	keys = {
+		{ "<leader>gb", "<cmd>Gitsigns blame_line<cr>", desc = "Blame line" },
+		{ "<leader>tgb", "<cmd>Gitsigns toggle_current_line_blame<cr>", desc = "Toggle blame line" },
+	},
 	config = function()
 		vim.keymap.set("n", "<leader>gu", "<cmd>:Gitsigns reset_hunk<CR>", { desc = "Reset git hunk" })
 		vim.keymap.set("v", "<leader>gu", "<cmd>:'<,'>Gitsigns reset_hunk<CR>", { desc = "Reset git hunk selection" })
@@ -28,7 +32,7 @@ return {
 			current_line_blame_opts = {
 				virt_text = true,
 				virt_text_pos = "eol", -- 'eol' | 'overlay' | 'right_align'
-				delay = 1000,
+				delay = 50,
 				ignore_whitespace = false,
 				virt_text_priority = 100,
 			},

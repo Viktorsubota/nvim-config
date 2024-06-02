@@ -1,7 +1,7 @@
 return {
 	"theprimeagen/harpoon",
-	-- branch = "harpoon2",
-	branch = "fix2/save-cursor-position",
+	branch = "harpoon2",
+	-- branch = "fix2/save-cursor-position",
 	dependencies = { "nvim-lua/plenary.nvim" },
 	event = "VeryLazy",
 	config = function()
