@@ -46,8 +46,9 @@ return {
 					},
 				},
 				lualine_x = { "filetype" },
-				lualine_y = { "progress", "location" },
-				lualine_z = { current_session_name },
+				lualine_y = { "progress" },
+				-- lualine_z = { current_session_name },
+				lualine_z = { "location" },
 			},
 			inactive_sections = {
 				lualine_a = {},

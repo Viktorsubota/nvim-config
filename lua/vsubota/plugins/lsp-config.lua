@@ -16,11 +16,8 @@ return {
 	},
 	{
 		"neovim/nvim-lspconfig",
-		lazy = true,
+		event = { "BufReadPre", "BufNewFile" },
 		config = function()
-			local lspconfig = require("lspconfig")
-			local capabilities = require("cmp_nvim_lsp").default_capabilities()
-
 			-- Setup key maps ------------------------------------
 
 			-- Use LspAttach autocommand to only map the following keys
@@ -36,9 +33,9 @@ return {
 					local opts = { buffer = ev.buf }
 					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
 					vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-					vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+					vim.keymap.set("n", "H", vim.lsp.buf.hover, opts)
 					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-					vim.keymap.set({ "n", "i" }, "<C-s>", vim.lsp.buf.signature_help, opts)
+					vim.keymap.set({ "n", "i" }, "<C-g>", vim.lsp.buf.signature_help, opts)
 					vim.keymap.set("n", "<space>wl", function()
 						print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
 					end, opts)
@@ -71,61 +68,6 @@ return {
 			vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
 			vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
 			vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist)
-
-			-- Setup LSPs ------------------------------------
-
-			local util = require("lspconfig/util")
-
-			lspconfig.ruff_lsp.setup({
-				capabilities = capabilities,
-				on_attach = function(client, _)
-					client.server_capabilities.hoverProvider = true
-				end,
-			})
-
-			lspconfig.gopls.setup({
-				cmd = { "gopls" },
-				filetypes = { "go", "gomod", "gowork", "gotmpl" },
-				root_dir = util.root_pattern("go.work", "go.mod", ".git"),
-				settings = {
-					gopls = {
-						completeUnimported = true,
-						usePlaceholders = true,
-						analyses = {
-							unusedparams = true,
-						},
-						staticcheck = true,
-						gofumpt = true,
-					},
-				},
-			})
-
-			lspconfig.lua_ls.setup({
-				capabilities = capabilities,
-				settings = {
-					Lua = {
-						runtime = {
-							-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-							version = "LuaJIT",
-						},
-						diagnostics = {
-							-- Get the language server to recognize the `vim` global
-							globals = { "vim" },
-						},
-						-- Do not send telemetry data containing a randomized but unique identifier
-						telemetry = {
-							enable = false,
-						},
-					},
-				},
-			})
-
-			lspconfig.lua_ls.setup({ capabilities = capabilities })
-			lspconfig.pyright.setup({ capabilities = capabilities })
-
-			lspconfig.terraformls.setup({ capabilities = capabilities })
-			lspconfig.yamlls.setup({ capabilities = capabilities })
-			lspconfig.jsonls.setup({ capabilities = capabilities })
 		end,
 	},
 	{
@@ -147,7 +89,86 @@ return {
 					"dockerls",
 					"pyright",
 					"gopls",
+					"terraformls",
 				},
+			})
+
+			local handlers = {
+				["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" }),
+				["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" }),
+			}
+
+			local lspconfig = require("lspconfig")
+			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+			local util = require("lspconfig/util")
+
+			require("mason-lspconfig").setup_handlers({
+				-- The first entry (without a key) will be the default handler
+				-- and will be called for each installed server that doesn't have
+				-- a dedicated handler.
+				function(server_name) -- default handler (optional)
+					require("lspconfig")[server_name].setup({
+						capabilities = capabilities,
+						handlers = handlers,
+					})
+				end,
+
+				["gopls"] = function()
+					lspconfig.gopls.setup({
+						capabilities = capabilities,
+						handlers = handlers,
+						cmd = { "gopls" },
+						filetypes = { "go", "gomod", "gowork", "gotmpl" },
+						root_dir = util.root_pattern("go.work", "go.mod", ".git"),
+						settings = {
+							gopls = {
+								completeUnimported = true,
+								usePlaceholders = true,
+								analyses = {
+									unusedparams = true,
+								},
+								staticcheck = true,
+								gofumpt = true,
+							},
+						},
+					})
+				end,
+				["ruff_lsp"] = function()
+					lspconfig.ruff_lsp.setup({
+						capabilities = capabilities,
+						handlers = handlers,
+						on_attach = function(client, _)
+							client.server_capabilities.hoverProvider = true
+						end,
+					})
+				end,
+				["lua_ls"] = function()
+					lspconfig.lua_ls.setup({
+						capabilities = capabilities,
+						handlers = handlers,
+						settings = {
+							Lua = {
+								runtime = {
+									-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+									version = "LuaJIT",
+								},
+								diagnostics = {
+									-- Get the language server to recognize the `vim` global
+									globals = { "vim" },
+								},
+								-- Do not send telemetry data containing a randomized but unique identifier
+								telemetry = {
+									enable = false,
+								},
+								hint = {
+									enable = true,
+									setType = true,
+									arrayIndex = "Enable",
+								},
+							},
+						},
+					})
+				end,
 			})
 		end,
 	},

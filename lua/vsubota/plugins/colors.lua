@@ -19,6 +19,7 @@ local custom_highlights = {
 			GitSignsAdd = { fg = colors.blue },
 			GitSignsChange = { fg = colors.yellow },
 			GitSignsDelete = { fg = colors.red },
+			GitSignsCurrentLineBlame = { fg = colors.overlay1 },
 
 			-- Collors for refs autohiglights
 			LspReferenceRead = { cterm = { bold = true }, ctermbg = 135, bg = colors.surface1 },
@@ -34,9 +35,12 @@ return {
 	priority = 1000,
 	config = function()
 		local current_colorscheme = "catppuccin-macchiato"
+		-- local current_colorscheme = "catppuccin-latte"
 
 		require("catppuccin").setup({
 			custom_highlights = custom_highlights[current_colorscheme],
+
+			transparent_background = true,
 
 			background = {
 				light = "latte",
