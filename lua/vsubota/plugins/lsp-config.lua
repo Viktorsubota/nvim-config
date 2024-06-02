@@ -1,7 +1,7 @@
 return {
 	{
 		"williamboman/mason.nvim",
-		event = { "BufReadPre", "BufNewFile" },
+		lazy = true,
 		config = function()
 			require("mason").setup({
 				ui = {
@@ -15,30 +15,10 @@ return {
 		end,
 	},
 	{
-		"williamboman/mason-lspconfig.nvim",
-		dependencies = {
-			-- LSP Support
-			"neovim/nvim-lspconfig",
-			"williamboman/mason.nvim",
-		},
-		opts = {
-			auto_install = true,
-		},
-		config = function()
-			require("mason-lspconfig").setup({
-				ensure_installed = {
-					"lua_ls",
-					"dockerls",
-					"pyright",
-					"gopls",
-				},
-			})
-		end,
-	},
-	{
 		"neovim/nvim-lspconfig",
+		event = { "BufReadPre", "BufNewFile" },
 		config = function()
-			local lspconfig = require("lspconfig")
+			-- Setup key maps ------------------------------------
 
 			-- Use LspAttach autocommand to only map the following keys
 			-- after the language server attaches to the current buffer
@@ -53,11 +33,9 @@ return {
 					local opts = { buffer = ev.buf }
 					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
 					vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-					vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+					vim.keymap.set("n", "H", vim.lsp.buf.hover, opts)
 					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-					vim.keymap.set({ "n", "i" }, "<C-h>", vim.lsp.buf.signature_help, opts)
-					vim.keymap.set("n", "<space>wa", vim.lsp.buf.add_workspace_folder, opts)
-					vim.keymap.set("n", "<space>wr", vim.lsp.buf.remove_workspace_folder, opts)
+					vim.keymap.set({ "n", "i" }, "<C-g>", vim.lsp.buf.signature_help, opts)
 					vim.keymap.set("n", "<space>wl", function()
 						print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
 					end, opts)
@@ -74,9 +52,6 @@ return {
 						-- Set autocommands conditional on server_capabilities
 						vim.api.nvim_exec(
 							[[
-    hi LspReferenceRead cterm=bold ctermbg=135 guibg=#363A4F
-    hi LspReferenceText cterm=bold ctermbg=135 guibg=#363A4F
-    hi LspReferenceWrite cterm=bold ctermbg=135 guibg=#363A4F
     augroup lsp_document_highlight
     autocmd! * <buffer>
     autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
@@ -93,34 +68,108 @@ return {
 			vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
 			vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
 			vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist)
-
-			lspconfig.lua_ls.setup({})
-
-			lspconfig.pyright.setup({})
-			lspconfig.ruff_lsp.setup({
-				on_attach = function(client, _)
-					client.server_capabilities.hoverProvider = true
-				end,
-			})
-
-			local util = require("lspconfig/util")
-			lspconfig.gopls.setup({
-				cmd = { "gopls" },
-				filetypes = { "go", "gomod", "gowork", "gotmpl" },
-				root_dir = util.root_pattern("go.work", "go.mod", ".git"),
-				settings = {
-					gopls = {
-						analyses = {
-							unusedparams = true,
-						},
-						staticcheck = true,
-						gofumpt = true,
-					},
+		end,
+	},
+	{
+		"williamboman/mason-lspconfig.nvim",
+		event = { "BufReadPre", "BufNewFile" },
+		dependencies = {
+			-- LSP Support
+			"neovim/nvim-lspconfig",
+			"williamboman/mason.nvim",
+		},
+		opts = {
+			auto_install = true,
+		},
+		config = function()
+			require("mason-lspconfig").setup({
+				ensure_installed = {
+					"bashls",
+					"lua_ls",
+					"dockerls",
+					"pyright",
+					"gopls",
+					"terraformls",
 				},
 			})
 
-			lspconfig.yamlls.setup({})
-			lspconfig.jsonls.setup({})
+			local handlers = {
+				["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" }),
+				["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" }),
+			}
+
+			local lspconfig = require("lspconfig")
+			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+			local util = require("lspconfig/util")
+
+			require("mason-lspconfig").setup_handlers({
+				-- The first entry (without a key) will be the default handler
+				-- and will be called for each installed server that doesn't have
+				-- a dedicated handler.
+				function(server_name) -- default handler (optional)
+					require("lspconfig")[server_name].setup({
+						capabilities = capabilities,
+						handlers = handlers,
+					})
+				end,
+
+				["gopls"] = function()
+					lspconfig.gopls.setup({
+						capabilities = capabilities,
+						handlers = handlers,
+						cmd = { "gopls" },
+						filetypes = { "go", "gomod", "gowork", "gotmpl" },
+						root_dir = util.root_pattern("go.work", "go.mod", ".git"),
+						settings = {
+							gopls = {
+								completeUnimported = true,
+								usePlaceholders = true,
+								analyses = {
+									unusedparams = true,
+								},
+								staticcheck = true,
+								gofumpt = true,
+							},
+						},
+					})
+				end,
+				["ruff_lsp"] = function()
+					lspconfig.ruff_lsp.setup({
+						capabilities = capabilities,
+						handlers = handlers,
+						on_attach = function(client, _)
+							client.server_capabilities.hoverProvider = true
+						end,
+					})
+				end,
+				["lua_ls"] = function()
+					lspconfig.lua_ls.setup({
+						capabilities = capabilities,
+						handlers = handlers,
+						settings = {
+							Lua = {
+								runtime = {
+									-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+									version = "LuaJIT",
+								},
+								diagnostics = {
+									-- Get the language server to recognize the `vim` global
+									globals = { "vim" },
+								},
+								-- Do not send telemetry data containing a randomized but unique identifier
+								telemetry = {
+									enable = false,
+								},
+								hint = {
+									enable = true,
+									setType = true,
+									arrayIndex = "Enable",
+								},
+							},
+						},
+					})
+				end,
+			})
 		end,
 	},
 }

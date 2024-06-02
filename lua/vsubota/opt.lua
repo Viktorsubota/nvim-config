@@ -1,5 +1,3 @@
-local o = vim.opt
-
 vim.opt.guicursor = ""
 
 vim.opt.nu = true
@@ -30,7 +28,7 @@ vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
-vim.opt.updatetime = 50
+vim.opt.updatetime = 100
 
 vim.opt.colorcolumn = "80,100"
 
@@ -46,3 +44,6 @@ vim.o.splitright = true
 
 -- Always split to the bottom
 vim.o.splitbelow = true
+
+-- Enable line highlighting for the current line by default
+vim.wo.cursorline = true

@@ -1,30 +1,59 @@
-function ApplyCustomColoros(color)
-	color = color or "catppuccin"
-	vim.cmd.colorscheme(color)
+local custom_highlights = {
+	["catppuccin-macchiato"] = function(colors)
+		return {
+			-- Number Line color
+			LineNr = { fg = colors.overlay0 },
+			-- Cursor Line color
+			CursorLineNr = { fg = colors.saphire },
 
-	vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-	vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+			-- Customize the highlighting color to grey for current and lenth lines
+			-- CursorLine = { bg = colors.surface0 },
+			-- ColorColumn = { bg = colors.surface0 },
+			CursorLine = { bg = "#303347" },
+			ColorColumn = { bg = "#303347" },
 
-	-- Enable line highlighting for the current line by default
-	vim.wo.cursorline = true
+			-- Function IBL line
+			IblScope = { fg = colors.surface2 },
 
-	-- Customize the highlighting color to grey
-	vim.cmd("highlight CursorLine ctermbg=223 guibg=#2c3042")
-	vim.cmd("highlight ColorColumn ctermbg=223 guibg=#2c3042")
+			-- Gitsign colors for added, changed and deleted lines
+			GitSignsAdd = { fg = colors.blue },
+			GitSignsChange = { fg = colors.yellow },
+			GitSignsDelete = { fg = colors.red },
+			GitSignsCurrentLineBlame = { fg = colors.overlay1 },
 
-	-- Number Line color
-	vim.cmd("highlight LineNr guifg=#6E6C7E")
-	-- Cursor Line color
-	vim.cmd("highlight CursorLineNr guifg=#C9CBFF")
-end
+			-- Collors for refs autohiglights
+			LspReferenceRead = { cterm = { bold = true }, ctermbg = 135, bg = colors.surface1 },
+			LspReferenceText = { cterm = { bold = true }, ctermbg = 135, bg = colors.surface1 },
+			LspReferenceWrite = { cterm = { bold = true }, ctermbg = 135, bg = colors.surface1 },
+		}
+	end,
+}
 
 return {
 	"catppuccin/nvim",
 	name = "catppuccin",
 	priority = 1000,
 	config = function()
-		require("catppuccin").setup({})
+		local current_colorscheme = "catppuccin-macchiato"
+		-- local current_colorscheme = "catppuccin-latte"
 
-		ApplyCustomColoros()
+		require("catppuccin").setup({
+			custom_highlights = custom_highlights[current_colorscheme],
+
+			transparent_background = true,
+
+			background = {
+				light = "latte",
+				dark = "macchiato",
+			},
+
+			dim_inactive = {
+				enabled = true, -- dims the background color of inactive window
+				shade = "dark",
+				percentage = 0.25, -- percentage of the shade to apply to the inactive window
+			},
+		})
+
+		vim.cmd.colorscheme(current_colorscheme)
 	end,
 }

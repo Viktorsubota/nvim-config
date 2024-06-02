@@ -1,6 +1,19 @@
 return {
 	"mfussenegger/nvim-dap-python",
 	ft = { "py" },
+	cmd = {
+		"DapContinue",
+		"DapLoadLaunchJSON",
+		"DapRestartFrame",
+		"DapSetLogLevel",
+		"DapShowLog",
+		"DapStepInto",
+		"DapStepOut",
+		"DapStepOver",
+		"DapTerminate",
+		"DapToggleBreakpoint",
+		"DapToggleRepl",
+	},
 	dependencies = {
 		"mfussenegger/nvim-dap",
 		"rcarriga/nvim-dap-ui",
