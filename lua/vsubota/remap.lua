@@ -24,10 +24,10 @@ vim.keymap.set("i", "<C-c>", "<Esc>")
 
 vim.keymap.set("n", "Q", "<nop>")
 
+vim.keymap.set("n", "<C-h>", "<C-w><C-h>")
+vim.keymap.set("n", "<C-j>", "<C-w><C-j>")
 vim.keymap.set("n", "<C-k>", "<C-w><C-k>")
-vim.keymap.set("n", "<C-k>", "<C-w><C-k>")
-vim.keymap.set("n", "<C-k>", "<C-w><C-k>")
-vim.keymap.set("n", "<C-k>", "<C-w><C-k>")
+vim.keymap.set("n", "<C-l>", "<C-w><C-l>")
 
 vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")
 vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")
@@ -49,3 +49,10 @@ vim.api.nvim_set_keymap("i", "<Left>", "<Nop>", { noremap = true, silent = true 
 vim.api.nvim_set_keymap("i", "<Right>", "<Nop>", { noremap = true, silent = true })
 
 vim.api.nvim_set_keymap("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
+
+vim.keymap.set("n", "<C-w>g", "<cmd>split<CR>")
+
+-- vim.api.nvim_set_keymap("n", "<C-W>H", ":vertical resize -5<CR>", { noremap = true })
+-- vim.api.nvim_set_keymap("n", "<C-W>J", ":resize +5<CR>", { noremap = true })
+-- vim.api.nvim_set_keymap("n", "<C-W>K", ":resize -5<CR>", { noremap = true })
+-- vim.api.nvim_set_keymap("n", "<C-W>L", ":vertical resize +5<CR>", { noremap = true })
