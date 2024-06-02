@@ -12,4 +12,6 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 local plugins = "vsubota/plugins"
-require("lazy").setup(plugins, {})
+require("lazy").setup(plugins, {
+	change_detection = { enabled = false },
+})
