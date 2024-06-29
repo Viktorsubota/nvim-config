@@ -1,18 +1,19 @@
 return {
 	"rcarriga/nvim-dap-ui",
-	cmd = {
-		"DapContinue",
-		"DapLoadLaunchJSON",
-		"DapRestartFrame",
-		"DapSetLogLevel",
-		"DapShowLog",
-		"DapStepInto",
-		"DapStepOut",
-		"DapStepOver",
-		"DapTerminate",
-		"DapToggleBreakpoint",
-		"DapToggleRepl",
-	},
+	event = "VeryLazy",
+	-- cmd = {
+	-- 	"DapContinue",
+	-- 	"DapLoadLaunchJSON",
+	-- 	"DapRestartFrame",
+	-- 	"DapSetLogLevel",
+	-- 	"DapShowLog",
+	-- 	"DapStepInto",
+	-- 	"DapStepOut",
+	-- 	"DapStepOver",
+	-- 	"DapTerminate",
+	-- 	"DapToggleBreakpoint",
+	-- 	"DapToggleRepl",
+	-- },
 	dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
 	config = function()
 		local dap, dapui = require("dap"), require("dapui")
