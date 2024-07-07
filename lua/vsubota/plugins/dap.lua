@@ -17,6 +17,7 @@ return {
 	keys = {
 		{ "<leader>db", "<cmd>DapToggleBreakpoint<cr>", desc = "Put Debug Breakpoint" },
 	},
+	lazy = true,
 	config = function()
 		vim.keymap.set("n", "<leader>db", "<cmd> DapToggleBreakpoint <CR>")
 
