@@ -1,12 +1,38 @@
+local opts = { noremap = true, silent = true }
+
 return {
 	{
 		"nvim-telescope/telescope.nvim",
-		tag = "0.1.5",
-		dependencies = { "nvim-lua/plenary.nvim", { "nvim-telescope/telescope-fzf-native.nvim", build = "make" } },
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"nvim-telescope/telescope-ui-select.nvim",
+			"nvim-telescope/telescope-live-grep-args.nvim",
+			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+		},
+        keys = {
+            { "<leader>pf",  "<cmd>Telescope find_files <CR>",          desc = "Find all files",                 opts },
+            { "<leader>pg",  "<cmd>Telescope git_files <CR>",           desc = "Find Git files",                 opts },
+            { "<leader>ps",  "<cmd>Telescope live_grep_args <CR>",      desc = "Project search with arguments",  opts },
+            { "<leader>pl",  "<cmd>Telescope live_grep <cr>",           desc = "find pattern staticly by files", opts },
+            { "<leader>pw",  "<cmd>Telescope grep_string",              desc = "find word under cursor",         opts },
+            { "<leader>pr",  "<cmd>Telescope lsp_references<cr>",       desc = "show lsp references",            opts },
+            { "<leader>pd",  "<cmd>Telescope lsp_definitions<cr>",      desc = "show lsp definitions",           opts },
+            { "<leader>pi",  "<cmd>Telescope lsp_implementations<cr>",  desc = "show lsp implementations",       opts },
+            { "<leader>pt",  "<cmd>Telescope lsp_type_definitions<cr>", desc = "show lsp type definitions",      opts },
+            { "<leader>pd",  "<cmd>Telescope diagnostics bufnr=0<cr>",  desc = "show buffer diagnostics",        opts },
+            { "<leader>poc", "<cmd>Telescope lsp_outgoing_calls<cr>",   desc = "show outgoing calls<cr>",        opts },
+            { "<leader>pic", "<cmd>Telescope lsp_incoming_calls<cr>",   desc = "show incoming calls<cr>",        opts },
+            { "<leader>pds", "<cmd>Telescope lsp_document_symbols<cr>", desc = "show document symbols<cr>",      opts },
+        },
+
+		cmd = { "Telescope" },
 		config = function()
 			local telescope = require("telescope")
+			local builtin = require("telescope.builtin")
 			local actions = require("telescope.actions")
 			local transform_mod = require("telescope.actions.mt").transform_mod
+			local lga_actions = require("telescope-live-grep-args.actions")
+			local action_state = require("telescope.actions.state")
 
 			-- or create your custom action
 			local custom_actions = transform_mod({
@@ -15,7 +41,41 @@ return {
 				end,
 			})
 
-			require("telescope").setup({
+			telescope.setup({
+				extensions = {
+					["ui-select"] = {
+						require("telescope.themes").get_dropdown({}),
+					},
+					live_grep_args = {
+						auto_quoting = true, -- enable/disable auto-quoting
+						-- define mappings, e.g.
+						mappings = { -- extend mappings
+							i = {
+								["<C-k>"] = lga_actions.quote_prompt(),
+								["<C-i>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
+								-- freeze the current list and start a fuzzy search in the frozen list
+								["<C-f>"] = actions.to_fuzzy_refine,
+							},
+						},
+					},
+				},
+				pickers = {
+					live_grep = {
+						mappings = {
+							i = {
+								["<C-f>"] = function(prompt_bufnr)
+									local current_prompt = action_state.get_current_line()
+									actions.close(prompt_bufnr)
+
+									builtin.grep_string({
+										prompt_title = "Live Grep: file filter",
+										search = current_prompt,
+									})
+								end,
+							},
+						},
+					},
+				},
 				defaults = {
 					layout_config = {
 						horizontal = {
@@ -35,57 +95,9 @@ return {
 				},
 			})
 
+			telescope.load_extension("live_grep_args")
 			telescope.load_extension("fzf")
-
-			local builtin = require("telescope.builtin")
-			vim.keymap.set("n", "<leader>pf", builtin.find_files, {})
-			vim.keymap.set("n", "<leader>pg", builtin.git_files, {})
-			vim.keymap.set("n", "<leader>pl", builtin.live_grep, {})
-			vim.keymap.set("n", "<leader>ps", function()
-				builtin.grep_string({ search = vim.fn.input("Grep > ") })
-			end)
-			vim.api.nvim_set_keymap("v", "<leader>pl", "y<ESC>:Telescope live_grep default_text=<c-r>0<CR>", {})
-
-			local opts = { noremap = true, silent = true }
-
-			opts.desc = "Show LSP references"
-			vim.keymap.set("n", "<leader>pr", "<cmd>Telescope lsp_references<CR>", opts)
-
-			opts.desc = "Show LSP definitions"
-			vim.keymap.set("n", "<leader>pd", "<cmd>Telescope lsp_definitions<CR>", opts)
-
-			opts.desc = "Show LSP implementations"
-			vim.keymap.set("n", "<leader>pi", "<cmd>Telescope lsp_implementations<CR>", opts)
-
-			opts.desc = "Show LSP type definitions"
-			vim.keymap.set("n", "<leader>pt", "<cmd>Telescope lsp_type_definitions<CR>", opts)
-
-			opts.desc = "Show buffer diagnostics"
-			vim.keymap.set("n", "<leader>pD", "<cmd>Telescope diagnostics bufnr=0<CR>", opts)
-
-			opts.desc = "Show outgoing calls<CR>"
-			vim.keymap.set("n", "<leader>poc", "<cmd>Telescope lsp_outgoing_calls<CR>", opts)
-
-			opts.desc = "Show incoming calls<CR>"
-			vim.keymap.set("n", "<leader>pic", "<cmd>Telescope lsp_incoming_calls<CR>", opts)
-
-			opts.desc = "Show document symbols<CR>"
-			vim.keymap.set("n", "<leader>pds", "<cmd>Telescope lsp_document_symbols<CR>", opts)
-		end,
-	},
-	{
-		"nvim-telescope/telescope-ui-select.nvim",
-		config = function()
-			-- This is your opts table
-			require("telescope").setup({
-				extensions = {
-					["ui-select"] = {
-						require("telescope.themes").get_dropdown({}),
-					},
-				},
-			})
-
-			require("telescope").load_extension("ui-select")
+			telescope.load_extension("ui-select")
 		end,
 	},
 }
