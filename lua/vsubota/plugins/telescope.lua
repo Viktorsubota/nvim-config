@@ -1,7 +1,6 @@
 return {
 	{
 		"nvim-telescope/telescope.nvim",
-		tag = "0.1.5",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"nvim-telescope/telescope-live-grep-args.nvim",
@@ -102,29 +101,6 @@ return {
 
 			opts.desc = "Show document symbols<CR>"
 			vim.keymap.set("n", "<leader>pds", "<cmd>Telescope lsp_document_symbols<CR>", opts)
-
-			-- local custom_live_grep = function()
-			-- 	local actions = require("telescope.actions")
-			-- 	local action_state = require("telescope.actions.state")
-			-- 	local pickers = require("telescope.pickers")
-			-- 	local finders = require("telescope.finders")
-			-- 	local conf = require("telescope.config").values
-			-- 	local builtin = require("telescope.builtin")
-
-			-- 	local grep_opts = {
-			-- 		glob_pattern = "",
-			-- 		pattern = "",
-			-- 		-- attach_mappings = function(_, map)
-			-- 		-- 	actions.close(prompt_bufnr)
-			-- 		-- 	print("Closed")
-			-- 		-- end,
-			-- 	}
-
-			-- 	builtin.live_grep(grep_opts)
-			-- end
-
-			-- 			opts.desc = "Test"
-			-- 			vim.keymap.set("n", "<leader>pq", custom_live_grep, opts)
 		end,
 	},
 	{
