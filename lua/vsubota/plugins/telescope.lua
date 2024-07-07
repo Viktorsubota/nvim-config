@@ -2,11 +2,17 @@ return {
 	{
 		"nvim-telescope/telescope.nvim",
 		tag = "0.1.5",
-		dependencies = { "nvim-lua/plenary.nvim", { "nvim-telescope/telescope-fzf-native.nvim", build = "make" } },
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"nvim-telescope/telescope-live-grep-args.nvim",
+			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+		},
 		config = function()
 			local telescope = require("telescope")
 			local actions = require("telescope.actions")
 			local transform_mod = require("telescope.actions.mt").transform_mod
+			local lga_actions = require("telescope-live-grep-args.actions")
+			local builtin = require("telescope.builtin")
 
 			-- or create your custom action
 			local custom_actions = transform_mod({
@@ -16,6 +22,20 @@ return {
 			})
 
 			require("telescope").setup({
+				extensions = {
+					live_grep_args = {
+						auto_quoting = true, -- enable/disable auto-quoting
+						-- define mappings, e.g.
+						mappings = { -- extend mappings
+							i = {
+								["<C-k>"] = lga_actions.quote_prompt(),
+								["<C-i>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
+								-- freeze the current list and start a fuzzy search in the frozen list
+								["<C-f>"] = actions.to_fuzzy_refine,
+							},
+						},
+					},
+				},
 				defaults = {
 					layout_config = {
 						horizontal = {
@@ -35,18 +55,29 @@ return {
 				},
 			})
 
+			telescope.load_extension("live_grep_args")
 			telescope.load_extension("fzf")
 
 			local builtin = require("telescope.builtin")
-			vim.keymap.set("n", "<leader>pf", builtin.find_files, {})
-			vim.keymap.set("n", "<leader>pg", builtin.git_files, {})
-			vim.keymap.set("n", "<leader>pl", builtin.live_grep, {})
+			-- local opts = { noremap = true, silent = true }
+			local opts = {}
+
+			opts.desc = "Find all files"
+			vim.keymap.set("n", "<leader>pf", builtin.find_files, opts)
+
+			opts.desc = "Find Git files"
+			vim.keymap.set("n", "<leader>pg", builtin.git_files, opts)
+
+			opts.desc = "Find pattern live with args"
+			vim.keymap.set("n", "<leader>pl", telescope.extensions.live_grep_args.live_grep_args, opts)
+
+			opts.desc = "Find pattern staticly by files"
 			vim.keymap.set("n", "<leader>ps", function()
 				builtin.grep_string({ search = vim.fn.input("Grep > ") })
-			end)
-			vim.api.nvim_set_keymap("v", "<leader>pl", "y<ESC>:Telescope live_grep default_text=<c-r>0<CR>", {})
+			end, opts)
 
-			local opts = { noremap = true, silent = true }
+			opts.desc = "Find word under cursor"
+			vim.keymap.set("n", "<leader>pw", builtin.grep_string, opts)
 
 			opts.desc = "Show LSP references"
 			vim.keymap.set("n", "<leader>pr", "<cmd>Telescope lsp_references<CR>", opts)
@@ -71,6 +102,29 @@ return {
 
 			opts.desc = "Show document symbols<CR>"
 			vim.keymap.set("n", "<leader>pds", "<cmd>Telescope lsp_document_symbols<CR>", opts)
+
+			-- local custom_live_grep = function()
+			-- 	local actions = require("telescope.actions")
+			-- 	local action_state = require("telescope.actions.state")
+			-- 	local pickers = require("telescope.pickers")
+			-- 	local finders = require("telescope.finders")
+			-- 	local conf = require("telescope.config").values
+			-- 	local builtin = require("telescope.builtin")
+
+			-- 	local grep_opts = {
+			-- 		glob_pattern = "",
+			-- 		pattern = "",
+			-- 		-- attach_mappings = function(_, map)
+			-- 		-- 	actions.close(prompt_bufnr)
+			-- 		-- 	print("Closed")
+			-- 		-- end,
+			-- 	}
+
+			-- 	builtin.live_grep(grep_opts)
+			-- end
+
+			-- 			opts.desc = "Test"
+			-- 			vim.keymap.set("n", "<leader>pq", custom_live_grep, opts)
 		end,
 	},
 	{
