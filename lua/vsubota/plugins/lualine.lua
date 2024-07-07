@@ -2,7 +2,6 @@ return {
 	"nvim-lualine/lualine.nvim",
 	dependencies = { "nvim-tree/nvim-web-devicons" },
 	config = function()
-		local current_session_name = require("auto-session.lib").current_session_name
 		require("lualine").setup({
 			options = {
 				icons_enabled = true,
@@ -47,7 +46,6 @@ return {
 				},
 				lualine_x = { "filetype" },
 				lualine_y = { "progress" },
-				-- lualine_z = { current_session_name },
 				lualine_z = { "location" },
 			},
 			inactive_sections = {
