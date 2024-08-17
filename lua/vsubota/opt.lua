@@ -47,3 +47,6 @@ vim.o.splitbelow = true
 
 -- Enable line highlighting for the current line by default
 vim.wo.cursorline = true
+
+vim.opt.spelllang = "en_us"
+vim.opt.spell = true
