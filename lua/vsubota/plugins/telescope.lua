@@ -30,7 +30,14 @@ return {
 			local telescope = require("telescope")
 			local actions = require("telescope.actions")
 			local lga_actions = require("telescope-live-grep-args.actions")
+			local transform_mod = require("telescope.actions.mt").transform_mod
 
+			-- or create your custom action
+			local custom_actions = transform_mod({
+				open_trouble_qflist = function(_)
+					vim.cmd("copen")
+				end,
+			})
 			telescope.setup({
 				extensions = {
 					["ui-select"] = {
