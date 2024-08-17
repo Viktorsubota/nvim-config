@@ -1,13 +1,13 @@
 return {
-	"sindrets/diffview.nvim",
-	cmd = {
-		"DiffviewClose",
-		"DiffviewFileHistory",
-		"DiffviewFocusFiles",
-		"DiffviewLog",
-		"DiffviewOpen",
-		"DiffviewRefresh",
-		"DiffviewToggleFiles",
-		"DisableAutoSave",
-	},
+    "sindrets/diffview.nvim",
+    cmd = {
+        "DiffviewClose",
+        "DiffviewFileHistory",
+        "DiffviewFocusFiles",
+        "DiffviewLog",
+        "DiffviewOpen",
+        "DiffviewRefresh",
+        "DiffviewToggleFiles",
+        "DisableAutoSave",
+    },
 }
