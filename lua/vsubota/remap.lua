@@ -52,6 +52,11 @@ vim.api.nvim_set_keymap("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search h
 
 vim.keymap.set("n", "<C-w>g", "<cmd>split<CR>")
 
+vim.keymap.set("n", "<C-w>g", "<cmd>split<CR>")
+
+vim.keymap.set("v", "<leader>bd", "y:let @\"=system('base64 --decode', @\")<cr>gvP")
+vim.keymap.set("v", "<leader>be", "y:let @\"=system('base64', @\")<cr>gvP")
+--
 -- vim.api.nvim_set_keymap("n", "<C-W>H", ":vertical resize -5<CR>", { noremap = true })
 -- vim.api.nvim_set_keymap("n", "<C-W>J", ":resize +5<CR>", { noremap = true })
 -- vim.api.nvim_set_keymap("n", "<C-W>K", ":resize -5<CR>", { noremap = true })
