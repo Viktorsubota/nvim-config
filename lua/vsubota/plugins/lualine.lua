@@ -16,9 +16,9 @@ return {
 				always_divide_middle = true,
 				globalstatus = false,
 				refresh = {
-					statusline = 2000,
-					tabline = 2000,
-					winbar = 2000,
+					statusline = 200,
+					tabline = 200,
+					winbar = 200,
 				},
 			},
 			sections = {
