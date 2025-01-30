@@ -10,7 +10,9 @@ vim.opt.expandtab = true
 
 vim.opt.smartindent = true
 
-vim.opt.wrap = false
+-- Enable soft wrapping (visual wrap) for long lines
+vim.opt.wrap = true -- Enable wrapping
+vim.opt.linebreak = true -- Do not break words in the middle
 
 vim.opt.swapfile = false
 vim.opt.backup = false
@@ -35,9 +37,6 @@ vim.opt.colorcolumn = "80,100"
 vim.g.mapleader = " "
 
 vim.opt.mouse = ""
-
--- Line numbers etc in Netrw
-vim.cmd([[let g:netrw_bufsettings = 'noma nomod nu nobl nowrap ro']])
 
 -- Always split to the right
 vim.o.splitright = true
