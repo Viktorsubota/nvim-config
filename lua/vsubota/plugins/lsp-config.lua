@@ -31,7 +31,7 @@ return {
 
 					-- Buffer local mappings.
 					-- See `:help vim.lsp.*` for documentation on any of the below functions
-					local opts = { buffer = ev.buf }
+					local opts = { buffer = ev.buf, noremap = true }
 					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
 					vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
 					vim.keymap.set("n", "H", vim.lsp.buf.hover, opts)
@@ -103,7 +103,7 @@ return {
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 			local util = require("lspconfig/util")
 
-			require("mason-lspconfig").setup_handlers({
+			require("mason-lspconfig").setup({
 				-- The first entry (without a key) will be the default handler
 				-- and will be called for each installed server that doesn't have
 				-- a dedicated handler.
