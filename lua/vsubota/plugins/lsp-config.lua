@@ -44,10 +44,6 @@ return {
 					vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, opts)
 					vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, opts)
 					vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-					vim.keymap.set("n", "<leader>ff", function()
-						vim.lsp.buf.format({ async = true })
-					end, opts)
-
 					local client = vim.lsp.get_clients({ id = ev.data.client_id })[1]
 					if client ~= nil and client.supports_method("textDocument/documentHighlight") then
 						local highlight_group = vim.api.nvim_create_augroup("lsp_document_highlight", { clear = false })
@@ -90,6 +86,7 @@ return {
 					"lua_ls",
 					"dockerls",
 					"pyright",
+					"ruff",
 					"gopls",
 					"terraformls",
 				},
@@ -140,7 +137,8 @@ return {
 						capabilities = capabilities,
 						handlers = handlers,
 						on_attach = function(client, _)
-							client.server_capabilities.hoverProvider = true
+							-- Disable hover in favor of pyright
+							client.server_capabilities.hoverProvider = false
 						end,
 					})
 				end,
