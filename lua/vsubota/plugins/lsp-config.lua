@@ -48,19 +48,20 @@ return {
 						vim.lsp.buf.format({ async = true })
 					end, opts)
 
-					local client = vim.lsp.get_client_by_id(ev.data.client_id)
+					local client = vim.lsp.get_clients({ id = ev.data.client_id })[1]
 					if client ~= nil and client.supports_method("textDocument/documentHighlight") then
-						-- Set autocommands conditional on server_capabilities
-						vim.api.nvim_exec(
-							[[
-    augroup lsp_document_highlight
-    autocmd! * <buffer>
-    autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
-    autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
-    augroup END
-    ]],
-							false
-						)
+						local highlight_group = vim.api.nvim_create_augroup("lsp_document_highlight", { clear = false })
+						vim.api.nvim_clear_autocmds({ group = highlight_group, buffer = ev.buf })
+						vim.api.nvim_create_autocmd("CursorHold", {
+							group = highlight_group,
+							buffer = ev.buf,
+							callback = vim.lsp.buf.document_highlight,
+						})
+						vim.api.nvim_create_autocmd("CursorMoved", {
+							group = highlight_group,
+							buffer = ev.buf,
+							callback = vim.lsp.buf.clear_references,
+						})
 					end
 				end,
 			})
