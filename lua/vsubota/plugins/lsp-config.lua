@@ -2,7 +2,7 @@ return {
 	{
 		"williamboman/mason.nvim",
 
-		lazy = true,
+		cmd = { "Mason", "MasonInstall", "MasonUninstall", "MasonUpdate" },
 		config = function()
 			require("mason").setup({
 				ui = {
@@ -34,9 +34,13 @@ return {
 					local opts = { buffer = ev.buf, noremap = true }
 					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
 					vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-					vim.keymap.set("n", "H", vim.lsp.buf.hover, opts)
+					vim.keymap.set("n", "H", function()
+						vim.lsp.buf.hover({ border = "rounded" })
+					end, opts)
 					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-					vim.keymap.set({ "n", "i" }, "<C-g>", vim.lsp.buf.signature_help, opts)
+					vim.keymap.set({ "n", "i" }, "<C-g>", function()
+						vim.lsp.buf.signature_help({ border = "rounded" })
+					end, opts)
 					vim.keymap.set("n", "<space>wl", function()
 						print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
 					end, opts)
@@ -80,6 +84,10 @@ return {
 			auto_install = true,
 		},
 		config = function()
+			local lspconfig = require("lspconfig")
+			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+			local util = require("lspconfig/util")
+
 			require("mason-lspconfig").setup({
 				ensure_installed = {
 					"bashls",
@@ -90,85 +98,66 @@ return {
 					"gopls",
 					"terraformls",
 				},
-			})
+				handlers = {
+					-- default handler for servers without a dedicated one
+					function(server_name)
+						lspconfig[server_name].setup({
+							capabilities = capabilities,
+						})
+					end,
 
-			local handlers = {
-				["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" }),
-				["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" }),
-			}
-
-			local lspconfig = require("lspconfig")
-			local capabilities = require("cmp_nvim_lsp").default_capabilities()
-			local util = require("lspconfig/util")
-
-			require("mason-lspconfig").setup({
-				-- The first entry (without a key) will be the default handler
-				-- and will be called for each installed server that doesn't have
-				-- a dedicated handler.
-				function(server_name) -- default handler (optional)
-					require("lspconfig")[server_name].setup({
-						capabilities = capabilities,
-						handlers = handlers,
-					})
-				end,
-
-				["gopls"] = function()
-					lspconfig.gopls.setup({
-						capabilities = capabilities,
-						handlers = handlers,
-						cmd = { "gopls" },
-						filetypes = { "go", "gomod", "gowork", "gotmpl" },
-						root_dir = util.root_pattern("go.work", "go.mod", ".git"),
-						settings = {
-							gopls = {
-								completeUnimported = true,
-								usePlaceholders = true,
-								analyses = {
-									unusedparams = true,
-								},
-								staticcheck = true,
-								gofumpt = true,
-							},
-						},
-					})
-				end,
-				["ruff"] = function()
-					lspconfig.ruff.setup({
-						capabilities = capabilities,
-						handlers = handlers,
-						on_attach = function(client, _)
-							-- Disable hover in favor of pyright
-							client.server_capabilities.hoverProvider = false
-						end,
-					})
-				end,
-				["lua_ls"] = function()
-					lspconfig.lua_ls.setup({
-						capabilities = capabilities,
-						handlers = handlers,
-						settings = {
-							Lua = {
-								runtime = {
-									-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-									version = "LuaJIT",
-								},
-								diagnostics = {
-									-- Get the language server to recognize the `vim` global
-									globals = { "vim" },
-								},
-								-- Do not send telemetry data containing a randomized but unique identifier
-								telemetry = {
-									enable = false,
-								},
-								hint = {
-									enable = true,
-									setType = true,
-									arrayIndex = "Enable",
+					["gopls"] = function()
+						lspconfig.gopls.setup({
+							capabilities = capabilities,
+							cmd = { "gopls" },
+							filetypes = { "go", "gomod", "gowork", "gotmpl" },
+							root_dir = util.root_pattern("go.work", "go.mod", ".git"),
+							settings = {
+								gopls = {
+									completeUnimported = true,
+									usePlaceholders = true,
+									analyses = {
+										unusedparams = true,
+									},
+									staticcheck = true,
+									gofumpt = true,
 								},
 							},
-						},
-					})
-				end,
+						})
+					end,
+					["ruff"] = function()
+						lspconfig.ruff.setup({
+							capabilities = capabilities,
+							on_attach = function(client, _)
+								-- Disable hover in favor of pyright
+								client.server_capabilities.hoverProvider = false
+							end,
+						})
+					end,
+					["lua_ls"] = function()
+						lspconfig.lua_ls.setup({
+							capabilities = capabilities,
+							settings = {
+								Lua = {
+									runtime = {
+										version = "LuaJIT",
+									},
+									diagnostics = {
+										globals = { "vim" },
+									},
+									telemetry = {
+										enable = false,
+									},
+									hint = {
+										enable = true,
+										setType = true,
+										arrayIndex = "Enable",
+									},
+								},
+							},
+						})
+					end,
+				},
 			})
 		end,
 	},
