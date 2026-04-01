@@ -73,6 +73,7 @@ return {
 			timeout = 3000,
 			width = { min = 40, max = 60 },
 			style = "compact",
+			top_down = false,
 		},
 		input = {
 			enabled = true,
