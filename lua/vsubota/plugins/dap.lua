@@ -19,10 +19,11 @@ return {
 	},
 	lazy = true,
 	config = function()
-		vim.keymap.set("n", "<leader>db", "<cmd> DapToggleBreakpoint <CR>")
-
 		local dap, dapui = require("dap"), require("dapui")
 		dapui.setup()
+
+		vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "DapBreakpoint" })
+		vim.api.nvim_set_hl(0, "DapBreakpoint", { fg = "#ff0000" })
 
 		dap.listeners.before.attach.dapui_config = function()
 			dapui.open()

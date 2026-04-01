@@ -33,7 +33,10 @@ return {
 					-- See `:help vim.lsp.*` for documentation on any of the below functions
 					local opts = { buffer = ev.buf, noremap = true }
 					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-					vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+					vim.keymap.set("n", "gd", function()
+						vim.lsp.buf.definition()
+						vim.defer_fn(function() vim.cmd("normal! zz") end, 100)
+					end, opts)
 					vim.keymap.set("n", "H", function()
 						vim.lsp.buf.hover({ border = "rounded" })
 					end, opts)
@@ -66,9 +69,15 @@ return {
 				end,
 			})
 
-			vim.keymap.set("n", "<space>vd", vim.diagnostic.open_float)
-			vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
-			vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
+			vim.keymap.set("n", "<space>vd", function()
+				vim.diagnostic.open_float({ border = "rounded" })
+			end)
+			vim.keymap.set("n", "[d", function()
+				vim.diagnostic.jump({ count = -1, float = { border = "rounded" } })
+			end)
+			vim.keymap.set("n", "]d", function()
+				vim.diagnostic.jump({ count = 1, float = { border = "rounded" } })
+			end)
 			vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist)
 		end,
 	},
@@ -80,15 +89,13 @@ return {
 			"neovim/nvim-lspconfig",
 			"williamboman/mason.nvim",
 		},
-		opts = {
-			auto_install = true,
-		},
 		config = function()
 			local lspconfig = require("lspconfig")
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
-			local util = require("lspconfig/util")
+			local util = require("lspconfig.util")
 
 			require("mason-lspconfig").setup({
+				auto_install = true,
 				ensure_installed = {
 					"bashls",
 					"lua_ls",
