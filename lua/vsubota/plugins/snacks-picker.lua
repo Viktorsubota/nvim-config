@@ -68,6 +68,15 @@ return {
 		},
 	},
 	opts = {
+		notifier = {
+			enabled = true,
+			timeout = 3000,
+			width = { min = 40, max = 60 },
+			style = "compact",
+		},
+		input = {
+			enabled = true,
+		},
 		picker = {
 			focus = "input",
 			matcher = {
