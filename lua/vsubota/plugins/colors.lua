@@ -21,7 +21,7 @@ local custom_highlights = {
 			GitSignsDelete = { fg = colors.red },
 			GitSignsCurrentLineBlame = { fg = colors.overlay1 },
 
-			-- Collors for refs autohiglights
+			-- Colors for refs auto-highlights
 			LspReferenceRead = { cterm = { bold = true }, ctermbg = 135, bg = colors.surface1 },
 			LspReferenceText = { cterm = { bold = true }, ctermbg = 135, bg = colors.surface1 },
 			LspReferenceWrite = { cterm = { bold = true }, ctermbg = 135, bg = colors.surface1 },

@@ -34,8 +34,13 @@ return {
 					local opts = { buffer = ev.buf, noremap = true }
 					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
 					vim.keymap.set("n", "gd", function()
-						vim.lsp.buf.definition()
-						vim.defer_fn(function() vim.cmd("normal! zz") end, 100)
+						vim.lsp.buf.definition({
+							on_list = function(options)
+								vim.fn.setqflist({}, " ", options)
+								vim.cmd.cfirst()
+								vim.cmd("normal! zz")
+							end,
+						})
 					end, opts)
 					vim.keymap.set("n", "H", function()
 						vim.lsp.buf.hover({ border = "rounded" })
