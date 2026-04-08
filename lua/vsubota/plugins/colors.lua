@@ -1,44 +1,25 @@
-local custom_highlights = {
-	["catppuccin-macchiato"] = function(colors)
-		return {
-			-- Number Line color
-			LineNr = { fg = colors.overlay0 },
-			-- Cursor Line color
-			CursorLineNr = { fg = colors.saphire },
-
-			-- Customize the highlighting color to grey for current and lenth lines
-			-- CursorLine = { bg = colors.surface0 },
-			-- ColorColumn = { bg = colors.surface0 },
-			CursorLine = { bg = "#303347" },
-			ColorColumn = { bg = "#303347" },
-
-			-- Function IBL line
-			IblScope = { fg = colors.surface2 },
-
-			-- Gitsign colors for added, changed and deleted lines
-			GitSignsAdd = { fg = colors.blue },
-			GitSignsChange = { fg = colors.yellow },
-			GitSignsDelete = { fg = colors.red },
-			GitSignsCurrentLineBlame = { fg = colors.overlay1 },
-
-			-- Colors for refs auto-highlights
-			LspReferenceRead = { cterm = { bold = true }, ctermbg = 135, bg = colors.surface1 },
-			LspReferenceText = { cterm = { bold = true }, ctermbg = 135, bg = colors.surface1 },
-			LspReferenceWrite = { cterm = { bold = true }, ctermbg = 135, bg = colors.surface1 },
-		}
-	end,
-}
-
 return {
 	"catppuccin/nvim",
 	name = "catppuccin",
 	priority = 1000,
 	config = function()
-		-- local current_colorscheme = "catppuccin-macchiato"
-		local current_colorscheme = "catppuccin-latte"
-
 		require("catppuccin").setup({
-			custom_highlights = custom_highlights[current_colorscheme],
+			custom_highlights = function(colors)
+				return {
+					LineNr = { fg = colors.overlay0 },
+					CursorLineNr = { fg = colors.sapphire },
+					CursorLine = { bg = vim.o.background == "dark" and "#3e4255" or colors.surface0 },
+					ColorColumn = { bg = vim.o.background == "dark" and "#3e4255" or colors.surface0 },
+					IblScope = { fg = colors.surface2 },
+					GitSignsAdd = { fg = colors.blue },
+					GitSignsChange = { fg = colors.yellow },
+					GitSignsDelete = { fg = colors.red },
+					GitSignsCurrentLineBlame = { fg = colors.overlay1 },
+					LspReferenceRead = { cterm = { bold = true }, ctermbg = 135, bg = colors.surface1 },
+					LspReferenceText = { cterm = { bold = true }, ctermbg = 135, bg = colors.surface1 },
+					LspReferenceWrite = { cterm = { bold = true }, ctermbg = 135, bg = colors.surface1 },
+				}
+			end,
 
 			transparent_background = true,
 
@@ -48,13 +29,26 @@ return {
 			},
 
 			dim_inactive = {
-				enabled = true, -- dims the background color of inactive window
+				enabled = true,
 				shade = "dark",
-				percentage = 0.25, -- percentage of the shade to apply to the inactive window
+				percentage = 0.25,
+			},
+
+			integrations = {
+				snacks = true,
 			},
 		})
 
-		-- vim.cmd.colorscheme("catppuccin")
-		vim.cmd.colorscheme(current_colorscheme)
+		vim.cmd.colorscheme("catppuccin")
+
+		vim.api.nvim_create_autocmd("OptionSet", {
+			pattern = "background",
+			callback = function()
+				vim.schedule(function()
+					require("catppuccin").compile()
+					vim.cmd.colorscheme("catppuccin")
+				end)
+			end,
+		})
 	end,
 }
