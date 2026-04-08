@@ -19,7 +19,7 @@ return {
 			{ "<leader>pd", "<cmd>Telescope lsp_definitions<cr>", desc = "show lsp definitions", opts },
 			{ "<leader>pi", "<cmd>Telescope lsp_implementations<cr>", desc = "show lsp implementations", opts },
 			{ "<leader>pt", "<cmd>Telescope lsp_type_definitions<cr>", desc = "show lsp type definitions", opts },
-			{ "<leader>pd", "<cmd>Telescope diagnostics bufnr=0<cr>", desc = "show buffer diagnostics", opts },
+			{ "<leader>pD", "<cmd>Telescope diagnostics bufnr=0<cr>", desc = "show buffer diagnostics", opts },
 			{ "<leader>poc", "<cmd>Telescope lsp_outgoing_calls<cr>", desc = "show outgoing calls<cr>", opts },
 			{ "<leader>pic", "<cmd>Telescope lsp_incoming_calls<cr>", desc = "show incoming calls<cr>", opts },
 			{ "<leader>pds", "<cmd>Telescope lsp_document_symbols<cr>", desc = "show document symbols<cr>", opts },

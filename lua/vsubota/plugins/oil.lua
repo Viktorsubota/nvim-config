@@ -20,6 +20,12 @@ return {
                     return name == ".." or name == ".git"
                 end,
             },
+            keymaps = {
+                ["<C-h>"] = false,
+                ["<C-l>"] = false,
+                ["<M-l>"] = { "actions.select", opts = { horizontal = true } },
+                ["<M-r>"] = "actions.refresh",
+            },
             win_options = {
                 wrap = true,
             },

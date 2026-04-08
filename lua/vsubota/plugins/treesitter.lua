@@ -2,14 +2,11 @@ return {
 	{
 		"nvim-treesitter/nvim-treesitter",
 		event = { "BufReadPre", "BufNewFile" },
-		build = function()
-			require("nvim-treesitter.install").update({ with_sync = true })()
-		end,
+		build = ":TSUpdate",
 		config = function()
 			require("nvim-treesitter.configs").setup({
 				-- A list of parser names, or "all" (the five listed parsers should always be installed)
 				ensure_installed = {
-					"help",
 					"lua",
 					"vim",
 					"vimdoc",
@@ -34,7 +31,7 @@ return {
 				-- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
 				auto_install = true,
 
-				ignore_install = { "help" },
+				ignore_install = {},
 
 				highlight = {
 					enable = true,
