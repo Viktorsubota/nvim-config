@@ -30,6 +30,8 @@ end
 
 return {
 	"folke/snacks.nvim",
+	lazy = false,
+	priority = 1000,
 	keys = {
 		{ "<leader>ff", function() Snacks.picker.files() end, desc = "Find files" },
 		{ "<leader>fg", function() Snacks.picker.git_files() end, desc = "Find git files" },
@@ -66,6 +68,7 @@ return {
 			end,
 			desc = "Find files in directory",
 		},
+		{ "<leader>lg", function() Snacks.lazygit.open() end, desc = "Open LazyGit" },
 	},
 	opts = {
 		notifier = {
@@ -76,6 +79,24 @@ return {
 			top_down = false,
 		},
 		input = {
+			enabled = true,
+		},
+		indent = {
+			enabled = true,
+			animate = { enabled = false },
+			indent = {
+				char = "▎",
+			},
+			scope = {
+				char = "▎",
+				underline = true,
+			},
+		},
+		bigfile = {
+			enabled = true,
+			size = 1024 * 1024, -- 1MB
+		},
+		lazygit = {
 			enabled = true,
 		},
 		picker = {
