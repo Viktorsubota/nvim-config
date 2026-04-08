@@ -2,7 +2,7 @@ return {
 	{
 		"williamboman/mason.nvim",
 
-		lazy = true,
+		cmd = { "Mason", "MasonInstall", "MasonUninstall", "MasonUpdate" },
 		config = function()
 			require("mason").setup({
 				ui = {
@@ -31,12 +31,24 @@ return {
 
 					-- Buffer local mappings.
 					-- See `:help vim.lsp.*` for documentation on any of the below functions
-					local opts = { buffer = ev.buf }
+					local opts = { buffer = ev.buf, noremap = true }
 					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-					vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-					vim.keymap.set("n", "H", vim.lsp.buf.hover, opts)
+					vim.keymap.set("n", "gd", function()
+						vim.lsp.buf.definition({
+							on_list = function(options)
+								vim.fn.setqflist({}, " ", options)
+								vim.cmd.cfirst()
+								vim.cmd("normal! zz")
+							end,
+						})
+					end, opts)
+					vim.keymap.set("n", "H", function()
+						vim.lsp.buf.hover({ border = "rounded" })
+					end, opts)
 					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-					vim.keymap.set({ "n", "i" }, "<C-g>", vim.lsp.buf.signature_help, opts)
+					vim.keymap.set({ "n", "i" }, "<C-g>", function()
+						vim.lsp.buf.signature_help({ border = "rounded" })
+					end, opts)
 					vim.keymap.set("n", "<space>wl", function()
 						print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
 					end, opts)
@@ -44,30 +56,33 @@ return {
 					vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, opts)
 					vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, opts)
 					vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-					vim.keymap.set("n", "<leader>ff", function()
-						vim.lsp.buf.format({ async = true })
-					end, opts)
-
-					local client = vim.lsp.get_client_by_id(ev.data.client_id)
+					local client = vim.lsp.get_clients({ id = ev.data.client_id })[1]
 					if client ~= nil and client.supports_method("textDocument/documentHighlight") then
-						-- Set autocommands conditional on server_capabilities
-						vim.api.nvim_exec(
-							[[
-    augroup lsp_document_highlight
-    autocmd! * <buffer>
-    autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
-    autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
-    augroup END
-    ]],
-							false
-						)
+						local highlight_group = vim.api.nvim_create_augroup("lsp_document_highlight", { clear = false })
+						vim.api.nvim_clear_autocmds({ group = highlight_group, buffer = ev.buf })
+						vim.api.nvim_create_autocmd("CursorHold", {
+							group = highlight_group,
+							buffer = ev.buf,
+							callback = vim.lsp.buf.document_highlight,
+						})
+						vim.api.nvim_create_autocmd("CursorMoved", {
+							group = highlight_group,
+							buffer = ev.buf,
+							callback = vim.lsp.buf.clear_references,
+						})
 					end
 				end,
 			})
 
-			vim.keymap.set("n", "<space>vd", vim.diagnostic.open_float)
-			vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
-			vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
+			vim.keymap.set("n", "<space>vd", function()
+				vim.diagnostic.open_float({ border = "rounded" })
+			end)
+			vim.keymap.set("n", "[d", function()
+				vim.diagnostic.jump({ count = -1, float = { border = "rounded" } })
+			end)
+			vim.keymap.set("n", "]d", function()
+				vim.diagnostic.jump({ count = 1, float = { border = "rounded" } })
+			end)
 			vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist)
 		end,
 	},
@@ -79,97 +94,82 @@ return {
 			"neovim/nvim-lspconfig",
 			"williamboman/mason.nvim",
 		},
-		opts = {
-			auto_install = true,
-		},
 		config = function()
+			local lspconfig = require("lspconfig")
+			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+			local util = require("lspconfig.util")
+
 			require("mason-lspconfig").setup({
+				auto_install = true,
 				ensure_installed = {
 					"bashls",
 					"lua_ls",
 					"dockerls",
 					"pyright",
+					"ruff",
 					"gopls",
 					"terraformls",
 				},
-			})
+				handlers = {
+					-- default handler for servers without a dedicated one
+					function(server_name)
+						lspconfig[server_name].setup({
+							capabilities = capabilities,
+						})
+					end,
 
-			local handlers = {
-				["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" }),
-				["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" }),
-			}
-
-			local lspconfig = require("lspconfig")
-			local capabilities = require("cmp_nvim_lsp").default_capabilities()
-			local util = require("lspconfig/util")
-
-			require("mason-lspconfig").setup_handlers({
-				-- The first entry (without a key) will be the default handler
-				-- and will be called for each installed server that doesn't have
-				-- a dedicated handler.
-				function(server_name) -- default handler (optional)
-					require("lspconfig")[server_name].setup({
-						capabilities = capabilities,
-						handlers = handlers,
-					})
-				end,
-
-				["gopls"] = function()
-					lspconfig.gopls.setup({
-						capabilities = capabilities,
-						handlers = handlers,
-						cmd = { "gopls" },
-						filetypes = { "go", "gomod", "gowork", "gotmpl" },
-						root_dir = util.root_pattern("go.work", "go.mod", ".git"),
-						settings = {
-							gopls = {
-								completeUnimported = true,
-								usePlaceholders = true,
-								analyses = {
-									unusedparams = true,
-								},
-								staticcheck = true,
-								gofumpt = true,
-							},
-						},
-					})
-				end,
-				["ruff"] = function()
-					lspconfig.ruff.setup({
-						capabilities = capabilities,
-						handlers = handlers,
-						on_attach = function(client, _)
-							client.server_capabilities.hoverProvider = true
-						end,
-					})
-				end,
-				["lua_ls"] = function()
-					lspconfig.lua_ls.setup({
-						capabilities = capabilities,
-						handlers = handlers,
-						settings = {
-							Lua = {
-								runtime = {
-									-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-									version = "LuaJIT",
-								},
-								diagnostics = {
-									-- Get the language server to recognize the `vim` global
-									globals = { "vim" },
-								},
-								-- Do not send telemetry data containing a randomized but unique identifier
-								telemetry = {
-									enable = false,
-								},
-								hint = {
-									enable = true,
-									setType = true,
-									arrayIndex = "Enable",
+					["gopls"] = function()
+						lspconfig.gopls.setup({
+							capabilities = capabilities,
+							cmd = { "gopls" },
+							filetypes = { "go", "gomod", "gowork", "gotmpl" },
+							root_dir = util.root_pattern("go.work", "go.mod", ".git"),
+							settings = {
+								gopls = {
+									completeUnimported = true,
+									usePlaceholders = true,
+									analyses = {
+										unusedparams = true,
+									},
+									staticcheck = true,
+									gofumpt = true,
 								},
 							},
-						},
-					})
-				end,
+						})
+					end,
+					["ruff"] = function()
+						lspconfig.ruff.setup({
+							capabilities = capabilities,
+							on_attach = function(client, _)
+								-- Disable hover in favor of pyright
+								client.server_capabilities.hoverProvider = false
+							end,
+						})
+					end,
+					["lua_ls"] = function()
+						lspconfig.lua_ls.setup({
+							capabilities = capabilities,
+							settings = {
+								Lua = {
+									runtime = {
+										version = "LuaJIT",
+									},
+									diagnostics = {
+										globals = { "vim" },
+									},
+									telemetry = {
+										enable = false,
+									},
+									hint = {
+										enable = true,
+										setType = true,
+										arrayIndex = "Enable",
+									},
+								},
+							},
+						})
+					end,
+				},
 			})
 		end,
 	},
