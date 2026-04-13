@@ -8,8 +8,11 @@ return {
 				return {
 					LineNr = { fg = colors.overlay0 },
 					CursorLineNr = { fg = colors.sapphire },
-					CursorLine = { bg = vim.o.background == "dark" and "#3e4255" or colors.surface0 },
-					ColorColumn = { bg = vim.o.background == "dark" and "#3e4255" or colors.surface0 },
+					-- Frappe surface0 (uncomment below for Macchiato)
+					CursorLine = { bg = vim.o.background == "dark" and "#414559" or colors.surface0 },
+					ColorColumn = { bg = vim.o.background == "dark" and "#414559" or colors.surface0 },
+					-- CursorLine = { bg = vim.o.background == "dark" and "#3e4255" or colors.surface0 },
+					-- ColorColumn = { bg = vim.o.background == "dark" and "#3e4255" or colors.surface0 },
 					IblScope = { fg = colors.surface2 },
 					GitSignsAdd = { fg = colors.blue },
 					GitSignsChange = { fg = colors.yellow },
@@ -58,7 +61,8 @@ return {
 
 			background = {
 				light = "latte",
-				dark = "macchiato",
+				dark = "frappe",
+				-- dark = "macchiato",
 			},
 
 			integrations = {
