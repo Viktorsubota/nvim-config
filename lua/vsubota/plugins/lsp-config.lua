@@ -42,12 +42,13 @@ return {
 							end,
 						})
 					end, opts)
+					local lsp_winhighlight = "Normal:LspFloatNormal,FloatBorder:LspFloatBorder"
 					vim.keymap.set("n", "H", function()
-						vim.lsp.buf.hover({ border = "rounded" })
+						vim.lsp.buf.hover({ border = "rounded", winhighlight = lsp_winhighlight })
 					end, opts)
 					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
 					vim.keymap.set({ "n", "i" }, "<C-g>", function()
-						vim.lsp.buf.signature_help({ border = "rounded" })
+						vim.lsp.buf.signature_help({ border = "rounded", winhighlight = lsp_winhighlight })
 					end, opts)
 					vim.keymap.set("n", "<space>wl", function()
 						print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
@@ -74,14 +75,15 @@ return {
 				end,
 			})
 
+			local diag_winhighlight = "Normal:LspFloatNormal,FloatBorder:LspFloatBorder"
 			vim.keymap.set("n", "<space>vd", function()
-				vim.diagnostic.open_float({ border = "rounded" })
+				vim.diagnostic.open_float({ border = "rounded", winhighlight = diag_winhighlight })
 			end)
 			vim.keymap.set("n", "[d", function()
-				vim.diagnostic.jump({ count = -1, float = { border = "rounded" } })
+				vim.diagnostic.jump({ count = -1, float = { border = "rounded", winhighlight = diag_winhighlight } })
 			end)
 			vim.keymap.set("n", "]d", function()
-				vim.diagnostic.jump({ count = 1, float = { border = "rounded" } })
+				vim.diagnostic.jump({ count = 1, float = { border = "rounded", winhighlight = diag_winhighlight } })
 			end)
 			vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist)
 		end,
