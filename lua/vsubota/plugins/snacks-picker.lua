@@ -133,6 +133,8 @@ return {
 					keys = {
 						["<C-j>"] = { "list_down", mode = { "i", "n" } },
 						["<C-k>"] = { "list_up", mode = { "i", "n" } },
+						["<C-d>"] = { "preview_scroll_down", mode = { "i", "n" } },
+						["<C-u>"] = { "preview_scroll_up", mode = { "i", "n" } },
 						["<C-f>"] = { "fuzzy_refine", mode = { "i", "n" }, desc = "Fuzzy refine results" },
 						["<C-q>"] = { "qflist", mode = { "i", "n" } },
 					},
