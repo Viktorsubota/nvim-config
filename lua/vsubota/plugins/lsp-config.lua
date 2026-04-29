@@ -58,7 +58,7 @@ return {
 					vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, opts)
 					vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
 					local client = vim.lsp.get_clients({ id = ev.data.client_id })[1]
-					if client ~= nil and client.supports_method("textDocument/documentHighlight") then
+					if client ~= nil and client:supports_method("textDocument/documentHighlight") then
 						local highlight_group = vim.api.nvim_create_augroup("lsp_document_highlight", { clear = false })
 						vim.api.nvim_clear_autocmds({ group = highlight_group, buffer = ev.buf })
 						vim.api.nvim_create_autocmd("CursorHold", {
