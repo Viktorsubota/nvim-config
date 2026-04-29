@@ -5,7 +5,13 @@ return {
 		{ "-", "<cmd>Oil<CR>", mode = { "n" } },
 		{ "<leader>pv", "<cmd>Oil<CR>", mode = { "n" } },
 	},
-	lazy = false,
+	cmd = "Oil",
+	init = function()
+		-- Load oil when nvim opens a directory, before netrw takes over
+		if vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.argv(0)) == 1 then
+			require("oil")
+		end
+	end,
 	-- Optional dependencies
 	dependencies = { "nvim-tree/nvim-web-devicons" },
 	config = function()
