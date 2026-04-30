@@ -50,6 +50,9 @@ vim.wo.cursorline = true
 vim.opt.spelllang = "en_us"
 vim.opt.spell = true
 
+-- Only log LSP warnings and errors (prevents multi-hundred MB log files)
+vim.lsp.log.set_level(vim.log.levels.WARN)
+
 -- Disable unused providers
 vim.g.loaded_node_provider = 0
 vim.g.loaded_perl_provider = 0
