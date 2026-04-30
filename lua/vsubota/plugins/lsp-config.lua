@@ -66,7 +66,7 @@ return {
 							buffer = ev.buf,
 							callback = vim.lsp.buf.document_highlight,
 						})
-						vim.api.nvim_create_autocmd("CursorMoved", {
+						vim.api.nvim_create_autocmd({ "CursorMoved", "InsertEnter" }, {
 							group = highlight_group,
 							buffer = ev.buf,
 							callback = vim.lsp.buf.clear_references,
