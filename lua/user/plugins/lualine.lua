@@ -2,6 +2,17 @@ return {
 	"nvim-lualine/lualine.nvim",
 	dependencies = { "nvim-tree/nvim-web-devicons" },
 	config = function()
+		local function oil_path_fmt(input)
+			local line = string.gsub(input, "oil://", ""):gsub("/$", ""):gsub("/ ", " ")
+
+			local path = vim.fn.fnamemodify(line, ":.:h")
+			local filename = vim.fn.fnamemodify(line, ":t")
+
+			-- local parts = { project, path, filename }
+			local parts = { path, filename }
+			return table.concat(parts, "/")
+		end
+
 		require("lualine").setup({
 			options = {
 				icons_enabled = true,
@@ -28,19 +39,7 @@ return {
 					{
 						"filename",
 						path = 1,
-						fmt = function(input)
-							local line = string.gsub(input, "oil://", ""):gsub("/$", ""):gsub("/ ", " ")
-
-							local path = vim.fn.fnamemodify(line, ":.:h")
-							local filename = vim.fn.fnamemodify(line, ":t")
-
-							-- local parts = { project, path, filename }
-							local parts = { path, filename }
-							return table.concat(parts, "/")
-						end,
-						-- color = function(_)
-						--  return { fg = "#8AADF4" }
-						-- end,
+						fmt = oil_path_fmt,
 					},
 				},
 				lualine_x = { "filetype" },
@@ -50,7 +49,13 @@ return {
 			inactive_sections = {
 				lualine_a = {},
 				lualine_b = {},
-				lualine_c = { { "filename", path = 1 } },
+				lualine_c = {
+					{
+						"filename",
+						path = 1,
+						fmt = oil_path_fmt,
+					},
+				},
 				lualine_x = { "location" },
 				lualine_y = {},
 				lualine_z = {},
