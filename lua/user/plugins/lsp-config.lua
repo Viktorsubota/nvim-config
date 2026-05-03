@@ -18,7 +18,6 @@ return {
 		dependencies = {
 			"mason-org/mason.nvim",
 			"mason-org/mason-lspconfig.nvim",
-			"hrsh7th/cmp-nvim-lsp",
 		},
 		config = function()
 			local lsp_winhighlight = "Normal:LspFloatNormal,FloatBorder:LspFloatBorder"
@@ -92,11 +91,6 @@ return {
 						})
 					end
 				end,
-			})
-
-			-- Apply nvim-cmp capabilities to every server
-			vim.lsp.config("*", {
-				capabilities = require("cmp_nvim_lsp").default_capabilities(),
 			})
 
 			vim.lsp.config("gopls", {
