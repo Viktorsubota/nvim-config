@@ -2,8 +2,10 @@ return {
 	"lewis6991/gitsigns.nvim",
 	event = { "VeryLazy" },
 	keys = {
-		{ "<leader>gb", "<cmd>Gitsigns blame_line<cr>", desc = "Blame line" },
-		{ "<leader>tgb", "<cmd>Gitsigns toggle_current_line_blame<cr>", desc = "Toggle blame line" },
+		{ "<leader>gb", "<cmd>Gitsigns blame_line<cr>", desc = "Blame line (popup)" },
+		{ "<leader>gB", "<cmd>Gitsigns toggle_current_line_blame<cr>", desc = "Toggle inline blame" },
+		{ "]h", "<cmd>Gitsigns nav_hunk next<cr>", desc = "Next git hunk" },
+		{ "[h", "<cmd>Gitsigns nav_hunk prev<cr>", desc = "Prev git hunk" },
 	},
 	config = function()
 		vim.keymap.set("n", "<leader>gu", "<cmd>:Gitsigns reset_hunk<CR>", { desc = "Reset git hunk" })
