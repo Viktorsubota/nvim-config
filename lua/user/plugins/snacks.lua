@@ -50,69 +50,6 @@ return {
 			desc = "Grep word/selection",
 		},
 		{
-			"<leader>fr",
-			function()
-				Snacks.picker.lsp_references()
-			end,
-			desc = "LSP references",
-		},
-		{
-			"<leader>fd",
-			function()
-				Snacks.picker.lsp_definitions()
-			end,
-			desc = "LSP definitions",
-		},
-		{
-			"<leader>fi",
-			function()
-				Snacks.picker.lsp_implementations()
-			end,
-			desc = "LSP implementations",
-		},
-		{
-			"<leader>ft",
-			function()
-				Snacks.picker.lsp_type_definitions()
-			end,
-			desc = "LSP type definitions",
-		},
-		{
-			"<leader>fdg",
-			function()
-				Snacks.picker.diagnostics()
-			end,
-			desc = "Global diagnostics",
-		},
-		{
-			"<leader>fdb",
-			function()
-				Snacks.picker.diagnostics()
-			end,
-			desc = "Buffer diagnostics",
-		},
-		{
-			"<leader>foc",
-			function()
-				Snacks.picker.lsp_outgoing_calls()
-			end,
-			desc = "Outgoing calls",
-		},
-		{
-			"<leader>fic",
-			function()
-				Snacks.picker.lsp_incoming_calls()
-			end,
-			desc = "Incoming calls",
-		},
-		{
-			"<leader>fds",
-			function()
-				Snacks.picker.lsp_symbols()
-			end,
-			desc = "Document symbols",
-		},
-		{
 			"<leader>fg",
 			function()
 				Snacks.picker.git_status()
