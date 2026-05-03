@@ -63,6 +63,13 @@ return {
 			end,
 			desc = "Open LazyGit",
 		},
+		{
+			"<leader>?",
+			function()
+				Snacks.picker.keymaps()
+			end,
+			desc = "Search keymaps",
+		},
 	},
 	opts = {
 		notifier = {
