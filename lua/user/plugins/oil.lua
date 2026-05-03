@@ -3,7 +3,6 @@ return {
 	opts = {},
 	keys = {
 		{ "-", "<cmd>Oil<CR>", mode = { "n" } },
-		{ "<leader>pv", "<cmd>Oil<CR>", mode = { "n" } },
 	},
 	cmd = "Oil",
 	init = function()
