@@ -1,64 +1,83 @@
 return {
 	{
-		"williamboman/mason.nvim",
-
+		"mason-org/mason.nvim",
 		cmd = { "Mason", "MasonInstall", "MasonUninstall", "MasonUpdate" },
-		config = function()
-			require("mason").setup({
-				ui = {
-					icons = {
-						package_installed = "✓",
-						package_pending = "➜",
-						package_uninstalled = "✗",
-					},
+		opts = {
+			ui = {
+				icons = {
+					package_installed = "✓",
+					package_pending = "➜",
+					package_uninstalled = "✗",
 				},
-			})
-		end,
+			},
+		},
 	},
 	{
 		"neovim/nvim-lspconfig",
 		event = { "BufReadPre", "BufNewFile" },
+		dependencies = {
+			"mason-org/mason.nvim",
+			"mason-org/mason-lspconfig.nvim",
+			"hrsh7th/cmp-nvim-lsp",
+		},
 		config = function()
-			-- Setup key maps ------------------------------------
+			local lsp_winhighlight = "Normal:LspFloatNormal,FloatBorder:LspFloatBorder"
 
-			-- Use LspAttach autocommand to only map the following keys
-			-- after the language server attaches to the current buffer
+			-- Style diagnostic floats globally; default [d/]d open the float on jump
+			vim.diagnostic.config({
+				float = { winhighlight = lsp_winhighlight },
+				jump = { float = true },
+			})
+
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 				callback = function(ev)
-					-- Enable completion triggered by <c-x><c-o>
-					vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
+					local map = function(mode, lhs, rhs)
+						vim.keymap.set(mode, lhs, rhs, { buffer = ev.buf, noremap = true })
+					end
 
-					-- Buffer local mappings.
-					-- See `:help vim.lsp.*` for documentation on any of the below functions
-					local opts = { buffer = ev.buf, noremap = true }
-					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-					vim.keymap.set("n", "gd", function()
-						vim.lsp.buf.definition({
-							on_list = function(options)
-								vim.fn.setqflist({}, " ", options)
-								vim.cmd.cfirst()
-								vim.cmd("normal! zz")
+					-- Drop nvim 0.11+ defaults that share the gr prefix and cause gr/gi/gd timeoutlen lag
+					for _, lhs in ipairs({ "grr", "grn", "gri", "gra", "grt", "grx" }) do
+						pcall(vim.keymap.del, "n", lhs)
+					end
+
+					-- IDE-conventional nav (Snacks pickers — auto-jump on single, picker on multiple, tagstack-aware)
+					map("n", "gd", function() Snacks.picker.lsp_definitions() end)
+					map("n", "gD", vim.lsp.buf.declaration)
+					map("n", "gr", function() Snacks.picker.lsp_references() end)
+					map("n", "gi", function() Snacks.picker.lsp_implementations() end)
+					map("n", "gO", function() Snacks.picker.lsp_symbols() end)
+					map("n", "K", function()
+						vim.lsp.buf.hover({ winhighlight = lsp_winhighlight })
+					end)
+					-- <C-s> is the 0.11+ default but tmux owns it; keep <C-g>
+					map({ "n", "i" }, "<C-g>", function()
+						vim.lsp.buf.signature_help({ winhighlight = lsp_winhighlight })
+					end)
+
+					-- Code actions / rename / diagnostic float / codelens
+					map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action)
+					map("n", "<leader>rn", vim.lsp.buf.rename)
+					map("n", "<leader>cd", vim.diagnostic.open_float)
+					map("n", "<leader>cl", vim.lsp.codelens.run)
+
+					local client = vim.lsp.get_client_by_id(ev.data.client_id)
+
+					-- Auto-refresh codelens (gopls test runners, rust-analyzer Run/Debug, etc.)
+					if client and client:supports_method("textDocument/codeLens") then
+						local codelens_group = vim.api.nvim_create_augroup("lsp_codelens_refresh", { clear = false })
+						vim.api.nvim_clear_autocmds({ group = codelens_group, buffer = ev.buf })
+						vim.lsp.codelens.refresh({ bufnr = ev.buf })
+						vim.api.nvim_create_autocmd({ "CursorHold", "InsertLeave" }, {
+							group = codelens_group,
+							buffer = ev.buf,
+							callback = function()
+								vim.lsp.codelens.refresh({ bufnr = ev.buf })
 							end,
 						})
-					end, opts)
-					local lsp_winhighlight = "Normal:LspFloatNormal,FloatBorder:LspFloatBorder"
-					vim.keymap.set("n", "H", function()
-						vim.lsp.buf.hover({ border = "rounded", winhighlight = lsp_winhighlight })
-					end, opts)
-					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-					vim.keymap.set({ "n", "i" }, "<C-g>", function()
-						vim.lsp.buf.signature_help({ border = "rounded", winhighlight = lsp_winhighlight })
-					end, opts)
-					vim.keymap.set("n", "<space>wl", function()
-						print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-					end, opts)
-					vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, opts)
-					vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, opts)
-					vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, opts)
-					vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-					local client = vim.lsp.get_clients({ id = ev.data.client_id })[1]
-					if client ~= nil and client:supports_method("textDocument/documentHighlight") then
+					end
+
+					if client and client:supports_method("textDocument/documentHighlight") then
 						local highlight_group = vim.api.nvim_create_augroup("lsp_document_highlight", { clear = false })
 						vim.api.nvim_clear_autocmds({ group = highlight_group, buffer = ev.buf })
 						vim.api.nvim_create_autocmd("CursorHold", {
@@ -75,103 +94,76 @@ return {
 				end,
 			})
 
-			local diag_winhighlight = "Normal:LspFloatNormal,FloatBorder:LspFloatBorder"
-			vim.keymap.set("n", "<space>vd", function()
-				vim.diagnostic.open_float({ border = "rounded", winhighlight = diag_winhighlight })
-			end)
-			vim.keymap.set("n", "[d", function()
-				vim.diagnostic.jump({ count = -1, float = { border = "rounded", winhighlight = diag_winhighlight } })
-			end)
-			vim.keymap.set("n", "]d", function()
-				vim.diagnostic.jump({ count = 1, float = { border = "rounded", winhighlight = diag_winhighlight } })
-			end)
-			vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist)
-		end,
-	},
-	{
-		"williamboman/mason-lspconfig.nvim",
-		event = { "BufReadPre", "BufNewFile" },
-		dependencies = {
-			-- LSP Support
-			"neovim/nvim-lspconfig",
-			"williamboman/mason.nvim",
-		},
-		config = function()
-			local lspconfig = require("lspconfig")
-			local capabilities = require("cmp_nvim_lsp").default_capabilities()
-			local util = require("lspconfig.util")
+			-- Apply nvim-cmp capabilities to every server
+			vim.lsp.config("*", {
+				capabilities = require("cmp_nvim_lsp").default_capabilities(),
+			})
+
+			vim.lsp.config("gopls", {
+				cmd = { "gopls" },
+				filetypes = { "go", "gomod", "gowork", "gotmpl" },
+				root_markers = { "go.work", "go.mod", ".git" },
+				settings = {
+					gopls = {
+						completeUnimported = true,
+						usePlaceholders = true,
+						analyses = { unusedparams = true },
+						staticcheck = true,
+						gofumpt = true,
+						codelenses = {
+							generate = true,
+							regenerate_cgo = true,
+							run_govulncheck = true,
+							test = true, -- "run test" / "run benchmark" above test funcs
+							tidy = true,
+							upgrade_dependency = true,
+							vendor = true,
+						},
+					},
+				},
+			})
+
+			vim.lsp.config("ruff", {
+				on_attach = function(client, _)
+					-- defer hover to pyright
+					client.server_capabilities.hoverProvider = false
+				end,
+			})
+
+			vim.lsp.config("lua_ls", {
+				settings = {
+					Lua = {
+						runtime = { version = "LuaJIT" },
+						diagnostics = { globals = { "vim" } },
+						workspace = {
+							library = vim.api.nvim_get_runtime_file("", true),
+							checkThirdParty = false,
+						},
+						telemetry = { enable = false },
+						hint = {
+							enable = true,
+							setType = true,
+							arrayIndex = "Enable",
+						},
+					},
+				},
+			})
 
 			require("mason-lspconfig").setup({
-				auto_install = true,
 				ensure_installed = {
 					"bashls",
-					"lua_ls",
 					"dockerls",
+					"gopls",
+					"jsonls",
+					"lua_ls",
+					"marksman",
 					"pyright",
 					"ruff",
-					"gopls",
 					"terraformls",
+					"ts_ls",
+					"yamlls",
 				},
-				handlers = {
-					-- default handler for servers without a dedicated one
-					function(server_name)
-						lspconfig[server_name].setup({
-							capabilities = capabilities,
-						})
-					end,
-
-					["gopls"] = function()
-						lspconfig.gopls.setup({
-							capabilities = capabilities,
-							cmd = { "gopls" },
-							filetypes = { "go", "gomod", "gowork", "gotmpl" },
-							root_dir = util.root_pattern("go.work", "go.mod", ".git"),
-							settings = {
-								gopls = {
-									completeUnimported = true,
-									usePlaceholders = true,
-									analyses = {
-										unusedparams = true,
-									},
-									staticcheck = true,
-									gofumpt = true,
-								},
-							},
-						})
-					end,
-					["ruff"] = function()
-						lspconfig.ruff.setup({
-							capabilities = capabilities,
-							on_attach = function(client, _)
-								-- Disable hover in favor of pyright
-								client.server_capabilities.hoverProvider = false
-							end,
-						})
-					end,
-					["lua_ls"] = function()
-						lspconfig.lua_ls.setup({
-							capabilities = capabilities,
-							settings = {
-								Lua = {
-									runtime = {
-										version = "LuaJIT",
-									},
-									diagnostics = {
-										globals = { "vim" },
-									},
-									telemetry = {
-										enable = false,
-									},
-									hint = {
-										enable = true,
-										setType = true,
-										arrayIndex = "Enable",
-									},
-								},
-							},
-						})
-					end,
-				},
+				automatic_enable = true,
 			})
 		end,
 	},
