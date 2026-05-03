@@ -32,6 +32,9 @@ vim.opt.isfname:append("@-@")
 
 vim.opt.updatetime = 250
 
+-- Default border for all floating windows (LSP hover/signature/diagnostic floats etc.)
+vim.o.winborder = "rounded"
+
 vim.opt.colorcolumn = "80,100"
 
 vim.g.mapleader = " "
