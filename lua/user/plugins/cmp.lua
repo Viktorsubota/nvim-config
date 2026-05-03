@@ -1,64 +1,48 @@
 return {
-	{
-		"hrsh7th/cmp-nvim-lsp",
-		event = { "InsertEnter" },
+	"saghen/blink.cmp",
+	version = "1.*", -- pinned to v1; minor/patch updates allowed
+	event = "InsertEnter",
+	dependencies = {
+		"rafamadriz/friendly-snippets", -- VSCode-format snippets; blink reads them directly
 	},
-	{
-		"L3MON4D3/LuaSnip",
-		event = { "InsertEnter" },
-		build = "make install_jsregexp",
-		dependencies = {
-			"saadparwaiz1/cmp_luasnip",
-			"rafamadriz/friendly-snippets",
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-path",
-			"hrsh7th/cmp-cmdline",
-			"hrsh7th/cmp-nvim-lua",
+	---@module "blink.cmp"
+	---@type blink.cmp.Config
+	opts = {
+		keymap = {
+			preset = "default",
+			-- Match the snacks picker convention (<C-j>/<C-k> for list nav)
+			["<C-j>"] = { "select_next", "fallback" },
+			["<C-k>"] = { "select_prev", "fallback" },
+			-- Snippet placeholder nav (in addition to the default <Tab>/<S-Tab>)
+			["<C-l>"] = { "snippet_forward", "fallback" },
+			["<C-h>"] = { "snippet_backward", "fallback" },
+			["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
+			["<C-b>"] = { "scroll_documentation_up", "fallback" },
+			["<C-f>"] = { "scroll_documentation_down", "fallback" },
+			["<C-e>"] = { "hide", "fallback" },
+			-- Inside a snippet placeholder, <CR> jumps to the next param.
+			-- Otherwise it accepts the selected completion (or inserts a newline).
+			["<CR>"] = { "snippet_forward", "accept", "fallback" },
 		},
+		completion = {
+			-- Auto-insert () after picking a function (replaces nvim-autopairs cmp glue)
+			accept = { auto_brackets = { enabled = true } },
+			menu = { border = "rounded" },
+			documentation = {
+				auto_show = true,
+				auto_show_delay_ms = 250,
+				window = { border = "rounded" },
+			},
+		},
+		signature = {
+			enabled = true,
+			window = { border = "rounded" },
+		},
+		sources = {
+			default = { "lsp", "snippets", "buffer", "path" },
+		},
+		snippets = { preset = "default" }, -- native vim.snippet
+		fuzzy = { implementation = "prefer_rust_with_warning" },
 	},
-	{
-		"hrsh7th/nvim-cmp",
-		event = { "InsertEnter" },
-		config = function()
-			require("luasnip.loaders.from_vscode").lazy_load()
-
-			-- If you want insert `(` after select function or method item
-			local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-			local cmp = require("cmp")
-			cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
-
-			cmp.setup({
-				snippet = {
-					expand = function(args)
-						require("luasnip").lsp_expand(args.body)
-					end,
-				},
-				window = {
-					completion = {
-						border = "rounded",
-						winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None",
-					},
-					documentation = {
-						border = "rounded",
-						winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None",
-					},
-				},
-				mapping = cmp.mapping.preset.insert({
-					["<C-b>"] = cmp.mapping.scroll_docs(-4),
-					["<C-f>"] = cmp.mapping.scroll_docs(4),
-					["<C-Space>"] = cmp.mapping.complete(),
-					["<C-e>"] = cmp.mapping.abort(),
-					["<CR>"] = cmp.mapping.confirm({ select = true }),
-				}),
-				sources = cmp.config.sources({
-					{ name = "nvim_lsp", max_item_count = 15 },
-					{ name = "luasnip", max_item_count = 10 }, -- For luasnip users.
-				}, {
-					{ name = "buffer" },
-					{ name = "path" },
-				}),
-			})
-		end,
-	},
+	opts_extend = { "sources.default" },
 }
