@@ -107,7 +107,7 @@ return {
 			},
 			layouts = {
 				telescope = {
-					reverse = true,
+					reverse = false,
 					layout = {
 						box = "horizontal",
 						backdrop = false,
