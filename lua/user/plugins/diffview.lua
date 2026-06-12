@@ -8,6 +8,5 @@ return {
         "DiffviewOpen",
         "DiffviewRefresh",
         "DiffviewToggleFiles",
-        "DisableAutoSave",
     },
 }
