@@ -30,7 +30,10 @@ vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
-vim.opt.updatetime = 100
+vim.opt.updatetime = 250
+
+-- Default border for all floating windows (LSP hover/signature/diagnostic floats etc.)
+vim.o.winborder = "rounded"
 
 vim.opt.colorcolumn = "80,100"
 
@@ -49,6 +52,9 @@ vim.wo.cursorline = true
 
 vim.opt.spelllang = "en_us"
 vim.opt.spell = true
+
+-- Only log LSP warnings and errors (prevents multi-hundred MB log files)
+vim.lsp.log.set_level(vim.log.levels.WARN)
 
 -- Disable unused providers
 vim.g.loaded_node_provider = 0
