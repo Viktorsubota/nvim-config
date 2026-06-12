@@ -5,8 +5,22 @@ return {
         "rcarriga/nvim-dap-ui",
     },
     keys = {
-        { "<leader>dm", function() require("dap-python").test_method() end, ft = "python", desc = "Debug Python method" },
-        { "<leader>dc", function() require("dap-python").test_class() end, ft = "python", desc = "Debug Python class" },
+        {
+            "<leader>dm",
+            function()
+                require("dap-python").test_method()
+            end,
+            ft = "python",
+            desc = "Debug Python method",
+        },
+        {
+            "<leader>dc",
+            function()
+                require("dap-python").test_class()
+            end,
+            ft = "python",
+            desc = "Debug Python class",
+        },
     },
     config = function()
         require("dap-python").setup(vim.fn.stdpath("data") .. "/mason/packages/debugpy/venv/bin/python")
