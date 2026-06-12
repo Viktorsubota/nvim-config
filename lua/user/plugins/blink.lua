@@ -8,6 +8,11 @@ return {
 	---@module "blink.cmp"
 	---@type blink.cmp.Config
 	opts = {
+		enabled = function()
+			return not vim.tbl_contains({ "snacks_picker_input" }, vim.bo.filetype)
+				and vim.bo.buftype ~= "prompt"
+				and vim.b.completion ~= false
+		end,
 		keymap = {
 			preset = "default",
 			-- Match the snacks picker convention (<C-j>/<C-k> for list nav)
