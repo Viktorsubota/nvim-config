@@ -25,11 +25,11 @@ return {
             ["<C-b>"] = { "scroll_documentation_up", "fallback" },
             ["<C-f>"] = { "scroll_documentation_down", "fallback" },
             ["<C-e>"] = { "hide", "fallback" },
-            -- Inside a snippet placeholder, <CR> jumps to the next param.
-            -- Otherwise it accepts the selected completion (or inserts a newline).
-            ["<CR>"] = { "snippet_forward", "accept", "fallback" },
+            ["<CR>"] = { "select_and_accept", "fallback" },
+            ["<C-y>"] = { "hide", "fallback" },
         },
         completion = {
+            list = { selection = { preselect = true, auto_insert = false } },
             -- Auto-insert () after picking a function (replaces nvim-autopairs cmp glue)
             accept = { auto_brackets = { enabled = true } },
             menu = { border = "rounded" },
@@ -45,9 +45,18 @@ return {
         },
         sources = {
             default = { "lsp", "snippets", "buffer", "path" },
+            providers = {
+                lsp = { score_offset = 100 },       -- LSP symbols (variables, methods, functions, keywords) top priority
+                snippets = { score_offset = 50 },   -- Snippets next
+                buffer = { score_offset = -10 },    -- Buffer text lower
+                path = { score_offset = -20 },
+            },
         },
         snippets = { preset = "default" }, -- native vim.snippet
-        fuzzy = { implementation = "prefer_rust_with_warning" },
+        fuzzy = {
+            implementation = "prefer_rust_with_warning",
+            sorts = { "exact", "score", "sort_text", "label" },
+        },
     },
     opts_extend = { "sources.default" },
 }

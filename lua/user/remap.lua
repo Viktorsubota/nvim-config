@@ -42,3 +42,20 @@ vim.keymap.set("n", "<C-w>g", "<cmd>split<CR>")
 
 vim.keymap.set("v", "<leader>bd", "y:let @\"=system('base64 --decode', @\")<cr>gvP")
 vim.keymap.set("v", "<leader>be", "y:let @\"=system('base64', @\")<cr>gvP")
+
+-- Snippet placeholder navigation in Normal/Select mode (<Tab> / <S-Tab>)
+vim.keymap.set({ "n", "s" }, "<Tab>", function()
+    if vim.snippet.active({ direction = 1 }) then
+        return "<cmd>lua vim.snippet.jump(1)<CR>"
+    else
+        return "<Tab>"
+    end
+end, { expr = true, silent = true, desc = "Jump to next snippet placeholder" })
+
+vim.keymap.set({ "n", "s" }, "<S-Tab>", function()
+    if vim.snippet.active({ direction = -1 }) then
+        return "<cmd>lua vim.snippet.jump(-1)<CR>"
+    else
+        return "<S-Tab>"
+    end
+end, { expr = true, silent = true, desc = "Jump to previous snippet placeholder" })
