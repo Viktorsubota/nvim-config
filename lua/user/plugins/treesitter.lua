@@ -1,71 +1,52 @@
+-- Parsers to install beyond the ones bundled with Neovim
+local parsers = {
+    "bash",
+    "diff",
+    "dockerfile",
+    "git_config",
+    "gitcommit",
+    "gitignore",
+    "go",
+    "gomod",
+    "gosum",
+    "hcl",
+    "javascript",
+    "json",
+    "lua",
+    "markdown",
+    "markdown_inline",
+    "python",
+    "regex", -- used by snacks picker for input highlighting
+    "terraform",
+    "toml",
+    "tsx",
+    "typescript",
+    "vim",
+    "vimdoc",
+    "yaml",
+}
+
 return {
     {
         "nvim-treesitter/nvim-treesitter",
-        event = { "BufReadPre", "BufNewFile" },
+        -- The archived master branch is incompatible with Neovim 0.12
+        -- (its query directives rely on the removed `all = false` shim)
+        branch = "main",
+        lazy = false, -- main branch does not support lazy-loading
         build = ":TSUpdate",
         config = function()
-            require("nvim-treesitter.configs").setup({
-                -- A list of parser names, or "all" (the five listed parsers should always be installed)
-                ensure_installed = {
-                    "bash",
-                    "diff",
-                    "dockerfile",
-                    "git_config",
-                    "gitcommit",
-                    "gitignore",
-                    "go",
-                    "gomod",
-                    "gosum",
-                    "hcl",
-                    "javascript",
-                    "json",
-                    "lua",
-                    "markdown",
-                    "markdown_inline",
-                    "python",
-                    "regex", -- used by snacks picker for input highlighting
-                    "terraform",
-                    "tmux",
-                    "toml",
-                    "tsx",
-                    "typescript",
-                    "vim",
-                    "vimdoc",
-                    "yaml",
-                },
+            require("nvim-treesitter").install(parsers)
 
-                -- enable indentation
-                indent = { enable = true },
-
-                -- Install parsers synchronously (only applied to `ensure_installed`)
-                sync_install = false,
-
-                -- The `tree-sitter` CLI is not installed locally, and the archived
-                -- master branch errors when auto-installing on buffer open
-                -- (e.g. when opening files from a picker); install explicitly instead
-                auto_install = false,
-
-                ignore_install = {},
-
-                highlight = {
-                    enable = true,
-
-                    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-                    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-                    -- Using this option may slow down your editor, and you may see some duplicate highlights.
-                    -- Instead of true it can also be a list of languages
-                    additional_vim_regex_highlighting = false,
-                },
-
-                incremental_selection = {
-                    enable = true,
-                    keymaps = {
-                        init_selection = "<C-space>",
-                        node_incremental = "<C-space>",
-                        scope_incremental = false,
-                        node_decremental = "<bs>",
-                    },
-                },
+            vim.api.nvim_create_autocmd("FileType", {
+                group = vim.api.nvim_create_augroup("user_treesitter", { clear = true }),
+                callback = function(ev)
+                    local lang = vim.treesitter.language.get_lang(ev.match)
+                    -- start() errors when no parser is installed for the language
+                    if not lang or not pcall(vim.treesitter.start, ev.buf, lang) then
+                        return
+                    end
+                    vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+                end,
             })
         end,
     },
