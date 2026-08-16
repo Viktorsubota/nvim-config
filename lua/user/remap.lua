@@ -43,6 +43,43 @@ vim.keymap.set("n", "<C-w>g", "<cmd>split<CR>")
 vim.keymap.set("v", "<leader>bd", "y:let @\"=system('base64 --decode', @\")<cr>gvP")
 vim.keymap.set("v", "<leader>be", "y:let @\"=system('base64', @\")<cr>gvP")
 
+-- Yank buffer path: yp = full path, yd = directory (oil-aware).
+-- Honors register prefixes like native yank ("ayp); with no register
+-- it also copies to the system clipboard.
+local function yank_path(kind)
+    return function()
+        local path
+        if vim.bo.filetype == "oil" then
+            local oil = require("oil")
+            local dir = oil.get_current_dir()
+            if kind == "file" then
+                local entry = oil.get_cursor_entry()
+                path = entry and dir and (dir .. entry.name) or dir
+            else
+                path = dir
+            end
+        else
+            local name = vim.api.nvim_buf_get_name(0)
+            if name ~= "" then
+                path = kind == "file" and name or vim.fs.dirname(name)
+            end
+        end
+        if not path or path == "" then
+            vim.notify("No path for this buffer", vim.log.levels.WARN)
+            return
+        end
+        local reg = vim.v.register
+        vim.fn.setreg(reg, path)
+        if reg == '"' then
+            vim.fn.setreg("+", path)
+        end
+        vim.notify("Yanked: " .. path)
+    end
+end
+
+vim.keymap.set("n", "yp", yank_path("file"), { desc = "Yank file path (oil: entry under cursor)" })
+vim.keymap.set("n", "yd", yank_path("dir"), { desc = "Yank directory path" })
+
 -- Snippet placeholder navigation in Normal/Select mode (<Tab> / <S-Tab>)
 vim.keymap.set({ "n", "s" }, "<Tab>", function()
     if vim.snippet.active({ direction = 1 }) then
